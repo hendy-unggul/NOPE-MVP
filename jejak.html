@@ -283,6 +283,7 @@
 
     <div class="diary" id="diary"></div>
 
+    <!-- Tray Artefak 3x2 -->
     <div class="tray" id="tray"></div>
 
     <div class="tagline">
@@ -385,6 +386,7 @@
       });
     }
 
+    // === Aktifkan CTA Unggah ===
     function initUploadButton() {
       document.getElementById('upload-btn').addEventListener('click', () => {
         document.getElementById('file-input').click();
@@ -408,6 +410,7 @@
       });
     }
 
+    // === Aktifkan CTA Jejakkan ===
     function initJejakkanButton() {
       document.getElementById('jejakkan-btn').addEventListener('click', async () => {
         const content = document.getElementById('rant').value.trim();
@@ -426,7 +429,7 @@
         if (!error) {
           document.getElementById('rant').value = '';
           showConfirmation("Jejakmu tersimpan.");
-          await loadData(); // ✅ Ini yang memastikan jurnal update
+          await loadData(); // ✅ Refresh UI
           await analyzeOnboardingIfNeeded(supabase, currentUser);
         } else {
           alert('Gagal menyimpan jejak.');
@@ -448,7 +451,7 @@
       }
     }
 
-    // Init
+    // === Init ===
     loadData();
     initUploadButton();
     initJejakkanButton();
