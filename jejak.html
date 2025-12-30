@@ -483,5 +483,15 @@
       }, 100); // Tunggu 100ms agar DOM benar-benar siap
     });
   </script>
+<script>
+  // Force set Accept header untuk semua fetch
+  const originalFetch = window.fetch;
+  window.fetch = function(...args) {
+    if (args[1] && args[1].headers) {
+      args[1].headers['Accept'] = 'application/json';
+    }
+    return originalFetch.apply(this, args);
+  };
+</script>
 </body>
 </html>
