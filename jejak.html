@@ -263,6 +263,15 @@
       display: block;
       margin-top: 4px;
     }
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 20px;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      margin: 16px 0;
+    }
   </style>
 </head>
 <body>
@@ -363,41 +372,64 @@
 
     // === DATABASE: pastikan user ada ===
     async function ensureUserExists() {
-      const { data, error } = await supabase
-        .from('users')
-        .select('username')
-        .eq('username', currentUser)
-        .single();
-      if (error && error.code === 'PGRST116') {
-        await supabase.from('users').insert({ username: currentUser });
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('username')
+          .eq('username', currentUser)
+          .single();
+
+        if (error && error.code === 'PGRST116') {
+          await supabase.from('users').insert({ username: currentUser });
+        }
+      } catch (e) {
+        console.error('Gagal pastikan user:', e);
       }
     }
 
     // === MUAT DATA ===
     async function loadData() {
-      await ensureUserExists();
+      try {
+        await ensureUserExists();
 
-      // Artefacts
-      const {  artefactsData, error: artefactsError } = await supabase
-        .from('artefacts')
-        .select('*')
-        .eq('username', currentUser)
-        .order('created_at', { ascending: false })
-        .limit(6);
-      artefacts = artefactsError ? [] : artefactsData || [];
+        // Load artefacts
+        const { data: artefactsData, error: artefactsError } = await supabase
+          .from('artefacts')
+          .select('*')
+          .eq('username', currentUser)
+          .order('created_at', { ascending: false })
+          .limit(6);
 
-      // Rants
-      const {  rantsData, error: rantsError } = await supabase
-        .from('rants')
-        .select('*')
-        .eq('username', currentUser)
-        .order('created_at', { ascending: false })
-        .limit(5);
-      rants = rantsError ? [] : rantsData || [];
+        if (artefactsError) {
+          console.error('Gagal muat artefak:', artefactsError);
+          artefacts = [];
+        } else {
+          artefacts = artefactsData || [];
+        }
 
-      renderHero();
-      renderDiary();
-      renderTray();
+        // Load rants
+        const { data: rantsData, error: rantsError } = await supabase
+          .from('rants')
+          .select('*')
+          .eq('username', currentUser)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (rantsError) {
+          console.error('Gagal muat rant:', rantsError);
+          rants = [];
+        } else {
+          rants = rantsData || [];
+        }
+
+        renderHero();
+        renderDiary();
+        renderTray();
+
+      } catch (e) {
+        console.error('Error saat load data:', e);
+        showConfirmation("Gagal memuat data. Coba refresh.");
+      }
     }
 
     // === RENDER ===
@@ -416,6 +448,12 @@
     function renderDiary() {
       const container = document.getElementById('diary');
       container.innerHTML = '';
+
+      if (rants.length === 0) {
+        container.innerHTML = '<div class="empty-state">Belum ada jejak. Tinggalkan jejak pertamamu!</div>';
+        return;
+      }
+
       rants.forEach(r => {
         const entry = document.createElement('div');
         entry.className = 'diary-entry';
@@ -428,6 +466,12 @@
     function renderTray() {
       const tray = document.getElementById('tray');
       tray.innerHTML = '';
+
+      if (artefacts.length === 0) {
+        tray.innerHTML = '<div class="empty-state">Belum ada artefak. Unggah gambar pertamamu!</div>';
+        return;
+      }
+
       artefacts.slice(0, 6).forEach(a => {
         const div = document.createElement('div');
         div.className = 'tray-slot';
@@ -450,33 +494,35 @@
       showConfirmation("Mengunggah...");
       const fileName = `${currentUser}/${Date.now()}-${file.name}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('artefacts')
-        .upload(fileName, file);
+      try {
+        const { error: uploadError } = await supabase.storage
+          .from('artefacts')
+          .upload(fileName, file);
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        alert('Gagal mengunggah gambar.');
+        if (uploadError) {
+          throw new Error(`Upload gagal: ${uploadError.message}`);
+        }
+
+        const { data } = supabase.storage.from('artefacts').getPublicUrl(fileName);
+        const imageUrl = data.publicUrl;
+
+        const { error: dbError } = await supabase
+          .from('artefacts')
+          .insert({ username: currentUser, image_url: imageUrl, notation: '' });
+
+        if (dbError) {
+          throw new Error(`Simpan ke DB gagal: ${dbError.message}`);
+        }
+
+        showConfirmation("Gambar diunggah! Tambahkan notasi (maks 4 kata).");
+        await loadData();
+        showPostUploadPanel(); // ✅ Munculkan panel notasi setelah upload
+
+      } catch (e) {
+        console.error('Upload error:', e);
+        alert(e.message || 'Gagal mengunggah gambar.');
         showConfirmation("");
-        return;
       }
-
-      const { data } = supabase.storage.from('artefacts').getPublicUrl(fileName);
-      const imageUrl = data.publicUrl;
-
-      const { error: dbError } = await supabase
-        .from('artefacts')
-        .insert({ username: currentUser, image_url: imageUrl, notation: '' });
-
-      if (dbError) {
-        console.error('DB insert error:', dbError);
-        alert('Gagal menyimpan artefak.');
-        showConfirmation("");
-        return;
-      }
-
-      await loadData();
-      showPostUploadPanel(); // ✅ Munculkan panel notasi setelah upload
     }
 
     // === SIMPAN NOTASI ===
@@ -494,21 +540,25 @@
         return;
       }
 
-      const { error } = await supabase
-        .from('artefacts')
-        .update({ notation: text })
-        .eq('username', currentUser)
-        .eq('image_url', artefacts[0].image_url);
+      try {
+        const { error } = await supabase
+          .from('artefacts')
+          .update({ notation: text })
+          .eq('username', currentUser)
+          .eq('image_url', artefacts[0].image_url);
 
-      if (error) {
-        console.error('Notasi error:', error);
-        alert('Gagal menyimpan notasi.');
-        return;
+        if (error) {
+          throw new Error(`Gagal simpan notasi: ${error.message}`);
+        }
+
+        showConfirmation("Notasi tersimpan.");
+        await loadData();
+        hidePostUploadPanel(); // ✅ Sembunyikan panel setelah simpan
+
+      } catch (e) {
+        console.error('Notasi error:', e);
+        alert(e.message || 'Gagal menyimpan notasi.');
       }
-
-      showConfirmation("Notasi tersimpan.");
-      await loadData();
-      hidePostUploadPanel(); // ✅ Sembunyikan panel setelah simpan
     }
 
     // === POST RANT ===
@@ -520,19 +570,23 @@
         return;
       }
 
-      const { error } = await supabase
-        .from('rants')
-        .insert({ username: currentUser, content, zone: 'auto' });
+      try {
+        const { error } = await supabase
+          .from('rants')
+          .insert({ username: currentUser, content, zone: 'auto' });
 
-      if (error) {
-        console.error('Rant error:', error);
-        alert('Gagal menyimpan jejak.');
-        return;
+        if (error) {
+          throw new Error(`Gagal simpan rant: ${error.message}`);
+        }
+
+        document.getElementById('rant').value = '';
+        showConfirmation("Jejakmu tersimpan.");
+        await loadData();
+
+      } catch (e) {
+        console.error('Rant error:', e);
+        alert(e.message || 'Gagal menyimpan jejak.');
       }
-
-      document.getElementById('rant').value = '';
-      showConfirmation("Jejakmu tersimpan.");
-      await loadData();
     }
 
     // === NAVIGASI & LOGOUT ===
