@@ -1,1 +1,93 @@
+<!-- File: glitch.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GLITCH — NOPE</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .header {
+      padding: 20px 20px 12px;
+      text-align: center;
+    }
+    .section {
+      padding: 0 20px 24px;
+    }
+    .section-title {
+      font-size: 16px;
+      margin: 24px 0 12px;
+      color: #343deb;
+    }
+    .card {
+      background: rgba(255,255,255,0.03);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    .lock-icon {
+      display: inline-block;
+      background: #333;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      text-align: center;
+      line-height: 20px;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .notice {
+      text-align: center;
+      padding: 30px 20px;
+      color: #666;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>GLITCH</div>
+  </div>
 
+  <div class="section">
+    <div class="section-title">Gerakan</div>
+    <div class="card">Solidaritas Petisi → <a href="saynope-petisi.html">Lihat</a></div>
+    <div class="card">Zine Digital → <a href="saynope-zine.html">Baca</a></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Picks</div>
+    <div class="card">Pilihan Editor → <a href="glitch-picks.html">Jelajahi</a></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Wawancara</div>
+    <div class="card">Suara dari Mereka → <a href="glitch-wawancara.html">Dengar</a></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Hangouts</div>
+    <div class="card">
+      <span class="lock-icon">🔒</span>
+      Akses penuh butuh verifikasi email (hanya jika aktif ≥6 bulan)
+    </div>
+    <div class="notice">
+      GLITCH adalah ruang untuk yang sudah lama berjalan bersama NOPE.<br>
+      Jika kamu sudah 6 bulan di sini, <a href="#" onclick="requestVerification()">klik di sini</a> untuk verifikasi.
+    </div>
+  </div>
+
+  <script>
+    function requestVerification() {
+      const username = localStorage.getItem('nope_username');
+      if (!username) {
+        alert('Kamu belum login.');
+        return;
+      }
+      // Di versi lengkap: kirim request ke Supabase → kirim email via Resend/Twilio SendGrid
+      alert(`Fitur verifikasi email akan aktif di production.\nSaat ini, kamu bisa eksplor Picks & Wawancara tanpa batas.`);
+    }
+  </script>
+</body>
+</html>
