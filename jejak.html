@@ -36,7 +36,7 @@
       top: 0;
       background: #000000cc;
       backdrop-filter: blur(6px);
-      padding: 12px 16px;
+      padding: 12px 0; /* hapus padding kanan/kiri */
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -44,21 +44,23 @@
     }
     .logo {
       font-family: 'Manrope', sans-serif;
-      font-size: 28px; /* +20% dari 24px */
+      font-size: 28px;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--logo-color);
+      margin-left: 16px;
     }
     .top-right {
       display: flex;
-      gap: 12px;
       align-items: center;
+      margin-right: 20px; /* setting button 20px dari kanan */
     }
     .nav-mini {
       display: flex;
       gap: 8px;
       font-size: 11px;
       color: var(--muted);
+      margin-right: 20px; /* GLITCH 20px dari setting button */
     }
     .nav-mini span {
       cursor: pointer;
@@ -75,8 +77,7 @@
       color: var(--muted);
       font-size: 20px;
       cursor: pointer;
-      transform: rotate(90deg); /* Vertikal */
-      margin-left: 8px;
+      transform: rotate(90deg);
     }
     .greeting {
       text-align: center;
@@ -266,7 +267,7 @@
       <div class="artefak-notation" id="hero-notation-display"></div>
       <div class="hero-input" id="hero-input-container" style="display: none;">
         <input id="hero-notation" type="text" placeholder="notasi (maks 4 kata)" maxlength="50">
-        <button onclick="saveNotation()">Unggah</button>
+        <button id="upload-btn">Unggah</button>
       </div>
     </div>
 
@@ -299,35 +300,30 @@
     import { supabase } from './js/supabaseClient.js';
     import { analyzeOnboardingIfNeeded } from './js/onboarding.js';
 
-    // Inisialisasi
     const currentUser = localStorage.getItem('nope_username') || null;
     if (!currentUser) {
       window.location.href = 'index.html';
     }
     document.getElementById('username-display').textContent = currentUser;
 
-    // State lokal (untuk UI responsif)
     let artefacts = [];
     let rants = [];
 
-    // Ensure user exists in Supabase
+    // Ensure user exists
     async function ensureUserExists() {
       const { data, error } = await supabase
         .from('users')
         .select('username')
         .eq('username', currentUser)
         .single();
-
       if (error && error.code === 'PGRST116') {
         await supabase.from('users').insert({ username: currentUser });
       }
     }
 
-    // Load data dari Supabase
     async function loadData() {
       await ensureUserExists();
 
-      // Load artefacts
       const {  artefactsData } = await supabase
         .from('artefacts')
         .select('*')
@@ -338,7 +334,6 @@
       renderHero();
       renderTray();
 
-      // Load rants
       const { data: rantsData } = await supabase
         .from('rants')
         .select('*')
@@ -349,7 +344,6 @@
       renderDiary();
     }
 
-    // === Render UI ===
     function renderHero() {
       const heroImg = document.getElementById('hero-img');
       const heroNotation = document.getElementById('hero-notation-display');
@@ -393,63 +387,54 @@
       });
     }
 
-    // === Artefak Upload ===
+    // === Aktifkan CTA Unggah = Buka Galeri ===
+    function initUploadButton() {
+      document.getElementById('upload-btn').addEventListener('click', () => {
+        document.getElementById('file-input').click();
+      });
+    }
+
     async function handleFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
-
-      // Simpan sementara sebagai URL (untuk MVP)
       const imageUrl = URL.createObjectURL(file);
-
-      // Tampilkan di UI & minta notasi
-      artefacts.unshift({
-        image_url: imageUrl,
-        notation: '',
-        id: 'temp'
-      });
+      artefacts.unshift({ image_url: imageUrl, notation: '', id: 'temp' });
       renderHero();
       renderTray();
-      showConfirmation("Apa yang ingin kau sematkan pada gambar ini? (maks 4 kata)");
+      showConfirmation("Apa yang ingin kau sematkan? (maks 4 kata)");
       setTimeout(() => document.getElementById('hero-notation')?.focus(), 500);
     }
 
     async function saveNotation() {
       const notation = document.getElementById('hero-notation')?.value.trim() || '';
-      const words = notation.split(/\s+/).filter(w => w);
-      if (words.length > 4) {
+      if (notation.split(/\s+/).filter(w => w).length > 4) {
         alert('Maksimal 4 kata.');
         return;
       }
-
-      if (artefacts.length > 0 && artefacts[0].id === 'temp') {
-        // Upload ke Supabase
+      if (artefacts[0]?.id === 'temp') {
         const { error } = await supabase.from('artefacts').insert({
           username: currentUser,
           image_url: artefacts[0].image_url,
           notation: notation || null
         });
-
         if (!error) {
           showConfirmation("Jejakmu tersimpan.");
-          loadData(); // Refresh data
+          loadData();
         } else {
           alert('Gagal menyimpan artefak.');
         }
       }
     }
 
-    // === Rant ===
+    // === Perbaiki CTA Jejakkan ===
     async function postRant() {
       const content = document.getElementById('rant').value.trim();
-      if (!content) return;
-      if (content.length > 300) return;
-
+      if (!content || content.length > 300) return;
       const { error } = await supabase.from('rants').insert({
         username: currentUser,
         content: content,
         zone: 'auto'
       });
-
       if (!error) {
         document.getElementById('rant').value = '';
         showConfirmation("Jejakmu tersimpan.");
@@ -460,17 +445,13 @@
       }
     }
 
-    // === Util ===
     function showConfirmation(msg) {
       const el = document.getElementById('confirmation');
       el.textContent = msg;
       setTimeout(() => el.textContent = "", 3000);
     }
 
-    function goTo(page) {
-      window.location.href = page;
-    }
-
+    function goTo(page) { window.location.href = page; }
     function logout() {
       if (confirm('Keluar dari akun?')) {
         localStorage.removeItem('nope_username');
@@ -480,20 +461,13 @@
 
     // === Init ===
     loadData();
-
-    // Event listeners
+    initUploadButton();
     document.getElementById('jejakkan-btn').addEventListener('click', postRant);
-    document.getElementById('file-input').addEventListener('change', handleFileSelect);
-
-    // Enter key untuk notasi
     document.addEventListener('keypress', (e) => {
       if (e.target.id === 'hero-notation' && e.key === 'Enter') {
         saveNotation();
       }
     });
-
-    // Ritual (jika ada rituals.js)
-    if (typeof initRituals === 'function') initRituals();
   </script>
 </body>
 </html>
