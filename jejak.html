@@ -93,6 +93,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
     .artefak-notation {
       position: absolute;
@@ -245,6 +246,7 @@
       display: block;
       margin-top: 4px;
     }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -263,11 +265,11 @@
     </header>
 
     <div class="hero">
-      <img id="hero-img" src="https://picsum.photos/384/480?random=1" alt="artefak">
+      <img id="hero-img" src="https://placehold.co/384x480/111/333?text=+" alt="artefak">
       <div class="artefak-notation" id="hero-notation-display"></div>
       <div class="hero-input" id="hero-input-container" style="display: none;">
         <input id="hero-notation" type="text" placeholder="notasi (maks 4 kata)" maxlength="50">
-        <button id="upload-btn">Unggah</button>
+        <button id="save-notation-btn">Simpan</button>
       </div>
     </div>
 
@@ -276,7 +278,7 @@
         Hello <strong>@<span id="username-display"></span></strong><br>
         tinggalkan jejakmu dalam 300 huruf
       </div>
-      <textarea id="rant" maxlength="300"></textarea>
+      <textarea id="rant" maxlength="300" placeholder="...jejakmu dalam 300 huruf"></textarea>
       <button class="rant-cta" id="jejakkan-btn">Jejakkan</button>
       <div class="confirmation" id="confirmation"></div>
     </div>
@@ -294,81 +296,112 @@
 
   <input type="file" id="file-input" accept="image/*" style="display:none;">
 
-  <script type="module" src="js/supabaseClient.js"></script>
+  <!-- Supabase Client -->
   <script type="module">
-    import { supabase } from './js/supabaseClient.js';
-    import { analyzeOnboardingIfNeeded } from './js/onboarding.js';
+    // === IMPORT SUPABASE ===
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    
+    // Ganti dengan project URL & ANON KEY-mu
+    const supabaseUrl = 'https://your-project.supabase.co';
+    const supabaseAnonKey = 'your-anon-key-here';
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    const currentUser = localStorage.getItem('nope_username') || null;
+    // === STATE ===
+    const currentUser = localStorage.getItem('nope_username');
     if (!currentUser) {
       window.location.href = 'index.html';
     }
-    document.getElementById('username-display').textContent = currentUser;
 
     let artefacts = [];
     let rants = [];
 
+    // === DOM ELEMENTS ===
+    const usernameDisplay = document.getElementById('username-display');
+    const heroImg = document.getElementById('hero-img');
+    const heroNotationDisplay = document.getElementById('hero-notation-display');
+    const heroInputContainer = document.getElementById('hero-input-container');
+    const heroNotationInput = document.getElementById('hero-notation');
+    const fileInput = document.getElementById('file-input');
+    const confirmationEl = document.getElementById('confirmation');
+
+    // === INIT ===
+    usernameDisplay.textContent = currentUser;
+
+    // === UTILS ===
+    function showConfirmation(msg) {
+      confirmationEl.textContent = msg;
+      setTimeout(() => confirmationEl.textContent = '', 3000);
+    }
+
+    function validateNotation(text) {
+      const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+      return words.length <= 4;
+    }
+
+    // === DATABASE: Ensure user exists ===
     async function ensureUserExists() {
       const { data, error } = await supabase
         .from('users')
         .select('username')
         .eq('username', currentUser)
         .single();
+
       if (error && error.code === 'PGRST116') {
         await supabase.from('users').insert({ username: currentUser });
       }
     }
 
+    // === LOAD DATA ===
     async function loadData() {
       await ensureUserExists();
 
       // Load artefacts
-      const {  artefactsData } = await supabase
+      const { data: artefactsData, error: artefactsError } = await supabase
         .from('artefacts')
         .select('*')
         .eq('username', currentUser)
         .order('created_at', { ascending: false })
         .limit(6);
-      artefacts = artefactsData || [];
-      renderHero();
-      renderTray();
+
+      artefacts = artefactsError ? [] : (artefactsData || []);
 
       // Load rants
-      const { data: rantsData } = await supabase
+      const { data: rantsData, error: rantsError } = await supabase
         .from('rants')
         .select('*')
         .eq('username', currentUser)
         .order('created_at', { ascending: false })
         .limit(5);
-      rants = rantsData || [];
+
+      rants = rantsError ? [] : (rantsData || []);
+
+      renderHero();
       renderDiary();
+      renderTray();
     }
 
+    // === RENDER ===
     function renderHero() {
-      const heroImg = document.getElementById('hero-img');
-      const heroNotation = document.getElementById('hero-notation-display');
-      const inputContainer = document.getElementById('hero-input-container');
-
       if (artefacts.length > 0) {
         heroImg.src = artefacts[0].image_url;
         const notation = artefacts[0].notation || '';
-        heroNotation.textContent = notation;
-        inputContainer.style.display = notation ? 'none' : 'flex';
+        heroNotationDisplay.textContent = notation;
+        heroInputContainer.style.display = notation ? 'none' : 'flex';
       } else {
-        heroImg.src = 'https://picsum.photos/384/480?random=1';
-        heroNotation.textContent = '';
-        inputContainer.style.display = 'flex';
+        heroImg.src = 'https://placehold.co/384x480/111/333?text=+';
+        heroNotationDisplay.textContent = '';
+        heroInputContainer.style.display = 'flex';
       }
     }
 
     function renderDiary() {
       const container = document.getElementById('diary');
       container.innerHTML = '';
-      rants.forEach(rant => {
+      rants.forEach(r => {
         const entry = document.createElement('div');
         entry.className = 'diary-entry';
-        const date = new Date(rant.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
-        entry.innerHTML = `<time>${date}</time><p>${rant.content}</p>`;
+        const date = new Date(r.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        entry.innerHTML = `<time>${date}</time><p>${r.content}</p>`;
         container.appendChild(entry);
       });
     }
@@ -387,111 +420,152 @@
       });
     }
 
-    // === Aktifkan CTA Unggah ===
-    function initUploadButton() {
-      document.getElementById('upload-btn').addEventListener('click', () => {
-        document.getElementById('file-input').click();
-      });
+    // === UPLOAD ARTEFAK ===
+    async function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-      document.getElementById('file-input').addEventListener('change', async (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const imageUrl = URL.createObjectURL(file);
-        const { error } = await supabase.from('artefacts').insert({
-          username: currentUser,
-          image_url: imageUrl,
-          notation: ''
-        });
-        if (!error) {
-          loadData();
-          showConfirmation("Artefak berhasil ditambahkan.");
-        } else {
-          alert('Gagal menyimpan artefak.');
-        }
-      });
+      const fileName = `${currentUser}/${Date.now()}-${file.name}`;
+
+      // Upload ke storage
+      const { error: uploadError } = await supabase.storage
+        .from('artefacts')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        alert('Gagal mengunggah gambar.');
+        return;
+      }
+
+      // Dapatkan public URL
+      const { data } = supabase.storage.from('artefacts').getPublicUrl(fileName);
+      const imageUrl = data.publicUrl;
+
+      // Simpan ke DB
+      const { error: dbError } = await supabase
+        .from('artefacts')
+        .insert({ username: currentUser, image_url: imageUrl, notation: '' });
+
+      if (dbError) {
+        console.error('DB insert error:', dbError);
+        alert('Gagal menyimpan artefak.');
+        return;
+      }
+
+      showConfirmation("Artefak diunggah! Tambahkan notasi (maks 4 kata).");
+      await loadData();
+      heroNotationInput.focus();
     }
 
-    // === Aktifkan CTA Jejakkan ===
-    function initJejakkanButton() {
-      document.getElementById('jejakkan-btn').addEventListener('click', async () => {
-        const content = document.getElementById('rant').value.trim();
-        if (!content) return;
-        if (content.length > 300) {
-          alert('Maksimal 300 huruf.');
-          return;
-        }
+    // === SAVE NOTATION ===
+    async function saveNotation() {
+      const text = heroNotationInput.value.trim();
+      if (!text) {
+        alert('Notasi tidak boleh kosong.');
+        return;
+      }
+      if (!validateNotation(text)) {
+        alert('Maksimal 4 kata.');
+        return;
+      }
 
-        const { error } = await supabase.from('rants').insert({
-          username: currentUser,
-          content: content,
-          zone: 'auto'
-        });
+      const { error } = await supabase
+        .from('artefacts')
+        .update({ notation: text })
+        .eq('username', currentUser)
+        .eq('image_url', artefacts[0].image_url);
 
-        if (!error) {
-          document.getElementById('rant').value = '';
-          showConfirmation("Jejakmu tersimpan.");
-          await loadData();
-          await analyzeOnboardingIfNeeded(supabase, currentUser);
-        } else {
-          alert('Gagal menyimpan jejak.');
-        }
-      });
+      if (error) {
+        console.error('Gagal simpan notasi:', error);
+        alert('Gagal menyimpan notasi.');
+        return;
+      }
+
+      showConfirmation("Notasi tersimpan.");
+      await loadData();
     }
 
-    // === Aktifkan Navigasi ===
-    function initNavigation() {
-      document.getElementById('nav-jejak').addEventListener('click', () => {
-        window.location.href = 'jejak.html';
-      });
-      document.getElementById('nav-frekuensi').addEventListener('click', () => {
-        window.location.href = 'frekuensi.html';
-      });
-      document.getElementById('nav-saynope').addEventListener('click', () => {
-        window.location.href = 'saynope.html';
-      });
-      document.getElementById('nav-glitch').addEventListener('click', () => {
-        window.location.href = 'glitch.html';
-      });
-      document.getElementById('settings-btn').addEventListener('click', () => {
-        if (confirm('Keluar dari akun?')) {
-          localStorage.removeItem('nope_username');
-          window.location.href = 'index.html';
-        }
-      });
+    // === POST RANT ===
+    async function postRant() {
+      const content = document.getElementById('rant').value.trim();
+      if (!content) return;
+      if (content.length > 300) {
+        alert('Maksimal 300 huruf.');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('rants')
+        .insert({ username: currentUser, content, zone: 'auto' });
+
+      if (error) {
+        alert('Gagal menyimpan jejak.');
+        return;
+      }
+
+      document.getElementById('rant').value = '';
+      showConfirmation("Jejakmu tersimpan.");
+      await loadData();
     }
 
-    function showConfirmation(msg) {
-      const el = document.getElementById('confirmation');
-      el.textContent = msg;
-      setTimeout(() => el.textContent = "", 3000);
+    // === NAVIGATION ===
+    function navigateTo(page) {
+      window.location.href = page;
     }
 
-    // === Init ===
+    function logout() {
+      if (confirm('Keluar dari akun?')) {
+        localStorage.removeItem('nope_username');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // === EVENT LISTENERS ===
+    document.getElementById('upload-btn-placeholder').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', handleFileSelect);
+    document.getElementById('save-notation-btn').addEventListener('click', saveNotation);
+    document.getElementById('jejakkan-btn').addEventListener('click', postRant);
+
+    document.getElementById('nav-jejak').addEventListener('click', () => navigateTo('jejak.html'));
+    document.getElementById('nav-frekuensi').addEventListener('click', () => navigateTo('frekuensi.html'));
+    document.getElementById('nav-saynope').addEventListener('click', () => navigateTo('saynope.html'));
+    document.getElementById('nav-glitch').addEventListener('click', () => navigateTo('glitch.html'));
+    document.getElementById('settings-btn').addEventListener('click', logout);
+
+    heroNotationInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') saveNotation();
+    });
+
+    // === START ===
+    loadData();
+  </script>
+
+  <!-- Ganti tombol Unggah yang hilang -->
+  <script>
+    // Tambahkan "Unggah" button ke hero jika belum ada
     document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        try {
-          console.log('🚀 Inisialisasi dimulai...');
-          loadData();
-          initUploadButton();
-          initJejakkanButton();
-          initNavigation();
-          console.log('✅ Inisialisasi selesai.');
-        } catch (e) {
-          console.error('❌ Inisialisasi gagal:', e);
-          alert('Gagal memuat NOPE. Coba refresh.');
-        }
-      }, 100); // Tunggu 100ms agar DOM benar-benar siap
+      const hero = document.querySelector('.hero');
+      if (!document.getElementById('upload-btn-placeholder')) {
+        const uploadBtn = document.createElement('button');
+        uploadBtn.id = 'upload-btn-placeholder';
+        uploadBtn.textContent = 'Unggah';
+        uploadBtn.style.cssText = `
+          position: absolute;
+          bottom: 12px;
+          right: 12px;
+          background: var(--accent);
+          color: #000;
+          border: none;
+          border-radius: 6px;
+          padding: 4px 10px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+        `;
+        hero.appendChild(uploadBtn);
+      }
     });
   </script>
-<script>
-  // Force set Accept header untuk semua fetch
-  const originalFetch = window.fetch;
-  window.fetch = function(...args) {
-    if (args[1] && args[1].headers) {
-      args[1].headers['Accept'] = 'application/json';
-    }
-    return originalFetch.apply(this, args);
-  };
-</script>
 </body>
 </html>
