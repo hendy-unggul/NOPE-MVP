@@ -468,17 +468,19 @@
 
     // === Init ===
     document.addEventListener('DOMContentLoaded', () => {
-      try {
-        console.log('🚀 Inisialisasi dimulai...');
-        loadData();
-        initUploadButton();
-        initJejakkanButton();
-        initNavigation();
-        console.log('✅ Inisialisasi selesai.');
-      } catch (e) {
-        console.error('❌ Inisialisasi gagal:', e);
-        alert('Gagal memuat NOPE. Coba refresh.');
-      }
+      setTimeout(() => {
+        try {
+          console.log('🚀 Inisialisasi dimulai...');
+          loadData();
+          initUploadButton();
+          initJejakkanButton();
+          initNavigation();
+          console.log('✅ Inisialisasi selesai.');
+        } catch (e) {
+          console.error('❌ Inisialisasi gagal:', e);
+          alert('Gagal memuat NOPE. Coba refresh.');
+        }
+      }, 100); // Tunggu 100ms agar DOM benar-benar siap
     });
   </script>
 </body>
