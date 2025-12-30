@@ -80,7 +80,7 @@
       transform: rotate(90deg);
     }
     .greeting {
-      display: none; /* disembunyikan, pindah ke rant-box */
+      display: none;
     }
     .hero {
       position: relative;
@@ -256,7 +256,7 @@
       <div class="logo">NOPE</div>
       <div class="top-right">
         <div class="nav-mini">
-          <span>Jejak</span>
+          <span onclick="goTo('jejak.html')">Jejak</span>
           <span onclick="goTo('frekuensi.html')">Frekuensi</span>
           <span onclick="goTo('saynope.html')">SayNOPE</span>
           <span onclick="goTo('glitch.html')">GLITCH</span>
@@ -300,7 +300,7 @@
   </div>
 
   <!-- Hidden file input -->
-  <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+  <input type="file" id="file-input" accept="image/*" style="display:none;">
 
   <!-- Supabase & modul -->
   <script type="module" src="js/supabaseClient.js"></script>
@@ -396,10 +396,11 @@
 
     // === Aktifkan CTA Unggah ===
     function initUploadButton() {
-      document.getElementById('upload-btn').addEventListener('click', (e) => {
-        e.preventDefault();
+      document.getElementById('upload-btn').addEventListener('click', () => {
         document.getElementById('file-input').click();
       });
+
+      document.getElementById('file-input').addEventListener('change', handleFileSelect);
     }
 
     async function handleFileSelect(event) {
@@ -461,13 +462,17 @@
       });
     }
 
+    // === Aktifkan Navigasi ===
+    function goTo(page) {
+      window.location.href = page;
+    }
+
     function showConfirmation(msg) {
       const el = document.getElementById('confirmation');
       el.textContent = msg;
       setTimeout(() => el.textContent = "", 3000);
     }
 
-    function goTo(page) { window.location.href = page; }
     function logout() {
       if (confirm('Keluar dari akun?')) {
         localStorage.removeItem('nope_username');
