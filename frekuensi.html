@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NOPE — Frekuensi</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
-    :root {
+    :root,
+    [data-theme="dark"] {
       --bg: #000;
       --surface: #0a0a0a;
       --border: #1f1f1f;
@@ -15,9 +16,19 @@
       --accent: #4903fc;
       --logo-color: #ff9999;
     }
+    [data-theme="hackers"] {
+      --bg: #000;
+      --surface: #001100;
+      --border: #003300;
+      --text: #00ff00;
+      --muted: #00aa00;
+      --accent: #00ff44;
+      --logo-color: #00ff88;
+      font-family: 'Courier New', monospace !important;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: radial-gradient(ellipse at top, #0a0a0a, #000);
+      background: radial-gradient(ellipse at top, var(--surface), var(--bg));
       color: var(--text);
       font-family: 'Inter', sans-serif;
       font-size: 14px;
@@ -167,6 +178,24 @@
       text-align: center;
       padding: 12px 0;
     }
+
+    /* === RITUAL: PULSE === */
+    .pulse-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(73, 3, 252, 0.1);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 1000;
+      animation: pulse 1.2s ease-out;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.8); opacity: 0.7; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -186,7 +215,6 @@
 
     <div class="greeting">Hello @<span id="username-display"></span></div>
 
-    <!-- Hype Haus -->
     <div class="zones">
       <div class="zone-item" id="zone-hype">
         <div class="zone-icon">🎧</div>
@@ -194,29 +222,24 @@
           <h3 class="zone-title">Hype Haus</h3>
           <p class="zone-description">“Tempat nge-hype idol, drakor, atau AU tanpa takut di-spill.”</p>
           <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
         </div>
       </div>
 
-      <!-- Ngusahain -->
       <div class="zone-item" id="zone-ngusahain">
         <div class="zone-icon">💼</div>
         <div class="zone-content">
           <h3 class="zone-title">Ngusahain</h3>
           <p class="zone-description">“Cerita progress lo: dari skripsi sampe jualan thrifting.”</p>
           <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
         </div>
       </div>
 
-      <!-- Spill Zone -->
       <div class="zone-item" id="zone-spill">
         <div class="zone-icon">💬</div>
         <div class="zone-content">
           <h3 class="zone-title">Spill Zone</h3>
           <p class="zone-description">“Curhat, ngeluh, atau cuma pengin ngomong — no cap, no jaim.”</p>
           <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
         </div>
       </div>
     </div>
@@ -228,24 +251,19 @@
     </div>
   </div>
 
-  <!-- Load Supabase via script tag -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
 
   <script>
-    // === CHECK SUPABASE ===
     if (typeof supabase === 'undefined') {
+      alert('Gagal memuat Supabase.');
       console.error('Supabase tidak terload!');
-      alert('Gagal memuat Supabase. Coba refresh.');
     }
 
-    // === STATE ===
     const currentUser = localStorage.getItem('nope_username');
-    if (!currentUser) {
-      window.location.href = 'index.html';
-    }
+    if (!currentUser) window.location.href = 'index.html';
     document.getElementById('username-display').textContent = currentUser;
 
-    // === KATA KUNCI ZONA ===
+    // === KATA KUNCI ZONA (20-30 per zona) ===
     const HYPE_KEYWORDS = [
       'v!', 'v!!!!', 'v', 'kpop', 'skz', 'txt', 'bts', 'seventeen', 'enhypen',
       'drakor', 'k-drama', 'squid game', 'crash landing', 'kim seon ho',
@@ -271,61 +289,41 @@
       'pengen ilang', 'pengen ngilang', 'susah', 'buntu', 'mentok'
     ];
 
-    // === DETEKSI ZONA DARI ISI RANT ===
     function detectZone(content) {
       const lower = content.toLowerCase();
-      
-      // Cek Hype Haus (prioritas tinggi untuk kata seperti "v!")
       if (HYPE_KEYWORDS.some(kw => lower.includes(kw))) return 'hype';
       if (NGUSAHAIN_KEYWORDS.some(kw => lower.includes(kw))) return 'ngusahain';
       if (SPILL_KEYWORDS.some(kw => lower.includes(kw))) return 'spill';
-      
-      // Jika tidak ketemu, masukkan ke Spill (safe default)
       return 'spill';
     }
 
-    // === LOAD SEMUA RANT & SORTIR PER ZONA ===
     async function loadFeed() {
       try {
-        // Ambil SEMUA rant (tanpa filter zone)
         const { data, error } = await supabase
           .from('rants')
           .select('*')
           .order('created_at', { ascending: false })
-          .limit(50); // ambil 50 terbaru
+          .limit(50);
+        if (error) throw error;
 
-        if (error) {
-          console.error('Gagal muat rant:', error);
-          renderAllZones([], [], []);
-          return;
-        }
-
-        const hypePosts = [];
-        const ngusahainPosts = [];
-        const spillPosts = [];
-
-        (data || []).forEach(rant => {
-          const zone = detectZone(rant.content);
-          if (zone === 'hype') {
-            if (hypePosts.length < 5) hypePosts.push(rant);
-          } else if (zone === 'ngusahain') {
-            if (ngusahainPosts.length < 5) ngusahainPosts.push(rant);
-          } else {
-            if (spillPosts.length < 5) spillPosts.push(rant);
-          }
+        const hype = [], ngusahain = [], spill = [];
+        (data || []).forEach(r => {
+          const zone = detectZone(r.content);
+          if (zone === 'hype' && hype.length < 5) hype.push(r);
+          else if (zone === 'ngusahain' && ngusahain.length < 5) ngusahain.push(r);
+          else if (spill.length < 5) spill.push(r);
         });
 
-        renderAllZones(hypePosts, ngusahainPosts, spillPosts);
+        renderZone('hype', hype);
+        renderZone('ngusahain', ngusahain);
+        renderZone('spill', spill);
 
       } catch (e) {
-        console.error('Error saat load feed:', e);
+        console.error('Gagal muat feed:', e);
+        renderZone('hype', []);
+        renderZone('ngusahain', []);
+        renderZone('spill', []);
       }
-    }
-
-    function renderAllZones(hype, ngusahain, spill) {
-      renderZone('hype', hype);
-      renderZone('ngusahain', ngusahain);
-      renderZone('spill', spill);
     }
 
     function renderZone(zoneKey, posts) {
@@ -333,9 +331,7 @@
       const divider = container.querySelector('.zone-divider');
       if (!divider) return;
 
-      while (divider.nextSibling) {
-        divider.parentNode.removeChild(divider.nextSibling);
-      }
+      while (divider.nextSibling) divider.parentNode.removeChild(divider.nextSibling);
 
       if (posts.length === 0) {
         const empty = document.createElement('div');
@@ -347,24 +343,20 @@
 
       const emojis = { hype: '🔥', ngusahain: '+1', spill: '🫂' };
       posts.forEach(post => {
-        const postEl = document.createElement('div');
-        postEl.className = 'zone-post-container';
-        postEl.innerHTML = `
+        const el = document.createElement('div');
+        el.className = 'zone-post-container';
+        el.innerHTML = `
           <div class="post-header">
             <span class="post-username">@${post.username}</span>
             <span class="post-emoji">${emojis[zoneKey]}</span>
           </div>
           <div class="post-content">${post.content}</div>
         `;
-        container.appendChild(postEl);
+        container.appendChild(el);
       });
     }
 
-    // === NAVIGASI ===
-    function navigateTo(page) {
-      window.location.href = page;
-    }
-
+    function nav(page) { window.location.href = page; }
     function logout() {
       if (confirm('Keluar dari akun?')) {
         localStorage.removeItem('nope_username');
@@ -372,15 +364,22 @@
       }
     }
 
-    // === INIT ===
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('nav-jejak').addEventListener('click', () => navigateTo('jejak.html'));
-      document.getElementById('nav-frekuensi').addEventListener('click', () => navigateTo('frekuensi.html'));
-      document.getElementById('nav-saynope').addEventListener('click', () => navigateTo('saynope.html'));
-      document.getElementById('nav-glitch').addEventListener('click', () => navigateTo('glitch.html'));
-      document.getElementById('settings-btn').addEventListener('click', logout);
+    // === RITUAL: PULSE ===
+    function triggerPulse() {
+      const pulse = document.createElement('div');
+      pulse.className = 'pulse-animation';
+      document.body.appendChild(pulse);
+      setTimeout(() => pulse.remove(), 1200);
+    }
 
-      loadFeed();
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('nav-jejak').onclick = () => nav('jejak.html');
+      document.getElementById('nav-frekuensi').onclick = () => nav('frekuensi.html');
+      document.getElementById('nav-saynope').onclick = () => nav('saynope.html');
+      document.getElementById('nav-glitch').onclick = () => nav('glitch.html');
+      document.getElementById('settings-btn').onclick = logout;
+
+      loadFeed().then(triggerPulse);
     });
   </script>
 </body>
