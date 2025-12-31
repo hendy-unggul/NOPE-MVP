@@ -365,9 +365,9 @@
   <input type="file" id="file-input" accept="image/*" style="display:none;">
 
   <script>
-    // === CONFIG ===
-    const SUPABASE_URL = 'https://your-project.supabase.co'; // 🔁 GANTI DENGAN PROJECT-MU
-    const SUPABASE_KEY = 'your-anon-key-here';               // 🔁 GANTI DENGAN ANON KEY-MU
+    // === CONFIG — GANTI INI DENGAN PROYEK & KEY-MU ===
+    const SUPABASE_URL = 'https://your-project-id.supabase.co'; // 🔁 GANTI DENGAN PROJECT ID-MU
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // 🔁 GANTI DENGAN ANON KEY-MU
 
     // === OLD FASHION WAY — MANUAL FETCH ===
     async function supabaseFetch(table, method = 'GET', body = null) {
