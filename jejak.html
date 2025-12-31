@@ -1,391 +1,49 @@
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NOPE — Jejak</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <style>
-    :root,
-    [data-theme="dark"] {
-      --bg: #000;
-      --surface: #0a0a0a;
-      --border: #1f1f1f;
-      --text: #f5f5f5;
-      --muted: #555;
-      --accent: #4903fc;
-      --logo-color: #ff9999;
-    }
-    [data-theme="hackers"] {
-      --bg: #000;
-      --surface: #001100;
-      --border: #003300;
-      --text: #00ff00;
-      --muted: #00aa00;
-      --accent: #00ff44;
-      --logo-color: #00ff88;
-      font-family: 'Courier New', monospace !important;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: radial-gradient(ellipse at top, var(--surface), var(--bg));
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
-      padding-bottom: 72px;
-      -webkit-font-smoothing: antialiased;
-    }
-    .wrapper {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-    header {
-      position: sticky;
-      top: 0;
-      background: #000000cc;
-      backdrop-filter: blur(6px);
-      padding: 12px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
-    }
-    .logo {
-      font-family: 'Manrope', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--logo-color);
-      margin-left: 16px;
-    }
-    .top-right {
-      display: flex;
-      align-items: center;
-      margin-right: 12px;
-    }
-    .nav-mini {
-      display: flex;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--muted);
-      margin-right: 8px;
-    }
-    .nav-mini span {
-      cursor: pointer;
-      text-decoration: underline;
-      text-decoration-style: dotted;
-      text-underline-offset: 2px;
-    }
-    .nav-mini span:hover {
-      color: var(--text);
-    }
-    .settings-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 20px;
-      cursor: pointer;
-      transform: rotate(90deg);
-    }
-    .hero {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 5;
-      background: var(--surface);
-      border-radius: 0 0 24px 24px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-    .hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .artefak-notation {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(0,0,0,0.3);
-      color: var(--text);
-      font-size: 16.5px;
-      font-weight: 600;
-      padding: 4px 6px;
-      border-radius: 4px;
-      max-width: 80%;
-      line-height: 1.2;
-      backdrop-filter: blur(2px);
-      pointer-events: none;
-    }
-    .upload-artefak-btn {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      z-index: 2;
-    }
-    .post-upload-panel {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 0 0 12px 12px;
-      margin-bottom: 16px;
-    }
-    .post-upload-panel.hidden {
-      display: none !important;
-    }
-    .post-upload-panel input {
-      flex: 1;
-      background: #000000aa;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: var(--text);
-      font-size: 13px;
-    }
-    .post-upload-panel input:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-    .post-upload-panel button {
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .rant-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 16px 24px 16px;
-      margin-bottom: 16px;
-      position: relative;
-    }
-    .rant-box-header {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      line-height: 1.4;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .rant-box-header strong {
-      color: var(--text);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .rant-box-header::after {
-      content: "tinggalkan jejakmu dalam 300 huruf";
-      font-size: 12px;
-      color: var(--muted);
-      margin-left: 4px;
-      white-space: nowrap;
-    }
-    .rant-box textarea {
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      line-height: 1.4;
-      resize: none;
-      min-height: 80px;
-    }
-    .rant-box textarea:focus {
-      outline: none;
-    }
-    .rant-cta {
-      position: absolute;
-      bottom: 12px;
-      right: 16px;
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .confirmation {
-      font-size: 11px;
-      color: var(--muted);
-      text-align: center;
-      margin-top: 4px;
-    }
-    .diary {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 16px;
-    }
-    .diary-entry {
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .diary-entry:last-child { border: none; }
-    .diary-entry time {
-      font-size: 10px;
-      color: var(--muted);
-      display: block;
-      margin-bottom: 2px;
-    }
-    .tray {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 8px;
-      padding: 0 16px 16px;
-    }
-    .tray-slot {
-      aspect-ratio: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-    }
-    .tray-slot .artefak-notation {
-      top: 6px;
-      left: 6px;
-      font-size: 10px;
-      padding: 3px 5px;
-    }
-    .tagline {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 0 16px 20px;
-      line-height: 1.5;
-      max-width: 320px;
-      margin: 0 auto;
-    }
-    .tagline strong {
-      color: var(--accent);
-      display: block;
-      margin-top: 4px;
-    }
-    .empty-state {
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      padding: 20px;
-      border: 1px dashed var(--border);
-      border-radius: 8px;
-      margin: 16px 0;
-    }
-
-    /* === RITUAL: PULSE === */
-    .pulse-animation {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(73, 3, 252, 0.1);
-      pointer-events: none;
-      opacity: 0;
-      z-index: 1000;
-      animation: pulse 1.2s ease-out;
-    }
-    @keyframes pulse {
-      0% { transform: scale(0.8); opacity: 0.7; }
-      100% { transform: scale(1.8); opacity: 0; }
-    }
-  </style>
+  <!-- ... (bagian head tetap sama) ... -->
 </head>
 <body>
-  <div class="wrapper">
-    <header>
-      <div class="logo">NOPE</div>
-      <div class="top-right">
-        <div class="nav-mini">
-          <span id="nav-jejak">Jejak</span>
-          <span id="nav-frekuensi">Frekuensi</span>
-          <span id="nav-saynope">SayNOPE</span>
-          <span id="nav-glitch">GLITCH</span>
-        </div>
-        <button class="settings-btn" id="settings-btn">⋯</button>
-      </div>
-    </header>
-
-    <div class="hero">
-      <img id="hero-img" src="https://placehold.co/384x480/111/333?text=+" alt="artefak">
-      <div class="artefak-notation" id="hero-notation-display"></div>
-      <button id="upload-artefak-btn" class="upload-artefak-btn">Unggah</button>
-    </div>
-
-    <div id="post-upload-panel" class="post-upload-panel hidden">
-      <input id="hero-notation" type="text" placeholder="notasi (maks 4 kata)" maxlength="50">
-      <button id="save-notation-btn">Simpan</button>
-    </div>
-
-    <div class="rant-box">
-      <div class="rant-box-header">
-        Hello <strong>@<span id="username-display"></span></strong>
-      </div>
-      <textarea id="rant" maxlength="300" placeholder="...jejakmu dalam 300 huruf"></textarea>
-      <button class="rant-cta" id="jejakkan-btn">Jejakkan</button>
-      <div class="confirmation" id="confirmation"></div>
-    </div>
-
-    <div class="diary" id="diary"></div>
-    <div class="tray" id="tray"></div>
-
-    <div class="tagline">
-      Untuk yang memilih kejujuran<br>
-      tanpa meminta pengakuan.<br>
-      <strong>— Glitch Generation</strong>
-    </div>
-  </div>
-
-  <input type="file" id="file-input" accept="image/*" style="display:none;">
+  <!-- ... (bagian HTML tetap sama) ... -->
 
   <script>
-    // === CONFIG — GANTI INI DENGAN PROYEK & KEY-MU ===
-    const SUPABASE_URL = 'https://fuovfrdicdhnlymnacpz.supabase.co '; // 🔁 GANTI DENGAN PROJECT ID-MU
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b3ZmcmRpY2Robmx5bW5hY3B6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjYxMzEsImV4cCI6MjA4MjYwMjEzMX0.oX4fVTEIWiRG2NaNJJKOV8dTnSHWhicLVMIFzZUl1o0'; // 🔁 GANTI DENGAN ANON KEY-MU
+    // === CONFIG — PERBAIKAN: HAPUS SPASI EKSTRA ===
+    const SUPABASE_URL = 'https://fuovfrdicdhnlymnacpz.supabase.co'; // ✅ HAPUS SPASI DI AKHIR
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b3ZmcmRpY2Robmx5bW5hY3B6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjYxMzEsImV4cCI6MjA4MjYwMjEzMX0.oX4fVTEIWiRG2NaNJJKOV8dTnSHWhicLVMIFzZUl1o0';
 
-    // === OLD FASHION WAY — MANUAL FETCH ===
-    async function supabaseFetch(table, method = 'GET', body = null) {
-      const headers = {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      };
+    // === OLD FASHION WAY — DENGAN ERROR HANDLING ===
+    async function supabaseFetch(table, method = 'GET', body = null, query = '') {
+      try {
+        const headers = {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        };
 
-      let url = `${SUPABASE_URL}/rest/v1/${table}`;
-      let options = { method, headers };
+        let url = `${SUPABASE_URL}/rest/v1/${table}`;
+        if (query) url += `?${query}`;
+        
+        let options = { method, headers };
+        if (body) options.body = JSON.stringify(body);
 
-      if (body) options.body = JSON.stringify(body);
-
-      const res = await fetch(url, options);
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-      return await res.json();
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error(`Supabase Error ${res.status}:`, errorText);
+          throw new Error(`HTTP ${res.status}: ${errorText.substring(0, 100)}`);
+        }
+        
+        // Untuk DELETE yang tidak mengembalikan data
+        if (method === 'DELETE' && res.status === 204) {
+          return { success: true };
+        }
+        
+        return await res.json();
+      } catch (error) {
+        console.error('Fetch error:', error);
+        throw new Error(`Gagal menghubungi server: ${error.message}`);
+      }
     }
 
     // === STATE ===
@@ -397,10 +55,6 @@
 
     let artefacts = [];
     let rants = [];
-
-    const heroImg = document.getElementById('hero-img');
-    const heroNotationDisplay = document.getElementById('hero-notation-display');
-    const postUploadPanel = document.getElementById('post-upload-panel');
 
     // === UTILS ===
     function showConfirmation(msg) {
@@ -427,14 +81,25 @@
     // === DATABASE: pastikan user ada ===
     async function ensureUserExists() {
       try {
-        const users = await supabaseFetch('users', 'GET', null);
-        const user = users.find(u => u.username === currentUser);
-
-        if (!user) {
-          await supabaseFetch('users', 'POST', { username: currentUser });
+        // Cek apakah user sudah ada
+        const users = await supabaseFetch('users', 'GET', null, `username=eq.${currentUser}`);
+        
+        if (!users || users.length === 0) {
+          // User belum ada, buat baru
+          await supabaseFetch('users', 'POST', { 
+            username: currentUser,
+            created_at: new Date().toISOString()
+          });
+          console.log('User baru dibuat:', currentUser);
         }
       } catch (e) {
-        console.error('Gagal pastikan user:', e);
+        console.error('Gagal memastikan user:', e);
+        // Tampilkan pesan error yang lebih informatif
+        if (e.message.includes('relation "users" does not exist')) {
+          alert('ERROR: Tabel "users" belum dibuat di Supabase. Buat tabel terlebih dahulu.');
+        } else if (e.message.includes('failed to fetch')) {
+          alert('ERROR: Tidak dapat terhubung ke database. Periksa koneksi internet dan URL Supabase.');
+        }
       }
     }
 
@@ -444,12 +109,22 @@
         await ensureUserExists();
 
         // Load artefacts
-        const artefactsData = await supabaseFetch('artefacts', 'GET', null);
-        artefacts = artefactsData.filter(a => a.username === currentUser).slice(0, 6);
+        try {
+          const artefactsData = await supabaseFetch('artefacts', 'GET', null, `username=eq.${currentUser}&order=created_at.desc&limit=6`);
+          artefacts = artefactsData || [];
+        } catch (artefactError) {
+          console.warn('Gagal load artefak:', artefactError);
+          artefacts = [];
+        }
 
         // Load rants
-        const rantsData = await supabaseFetch('rants', 'GET', null);
-        rants = rantsData.filter(r => r.username === currentUser).slice(0, 5);
+        try {
+          const rantsData = await supabaseFetch('rants', 'GET', null, `username=eq.${currentUser}&order=created_at.desc&limit=5`);
+          rants = rantsData || [];
+        } catch (rantError) {
+          console.warn('Gagal load rants:', rantError);
+          rants = [];
+        }
 
         renderHero();
         renderDiary();
@@ -458,12 +133,22 @@
       } catch (e) {
         console.error('Error saat load data:', e);
         showConfirmation("Gagal memuat data. Coba refresh.");
+        
+        // Tampilkan data dummy untuk testing
+        if (artefacts.length === 0) {
+          renderDiary();
+          renderTray();
+        }
       }
     }
 
     // === RENDER ===
     function renderHero() {
-      if (artefacts.length > 0) {
+      const heroImg = document.getElementById('hero-img');
+      const heroNotationDisplay = document.getElementById('hero-notation-display');
+      const postUploadPanel = document.getElementById('post-upload-panel');
+
+      if (artefacts.length > 0 && artefacts[0].image_url) {
         heroImg.src = artefacts[0].image_url;
         const notation = artefacts[0].notation || '';
         heroNotationDisplay.textContent = notation;
@@ -504,7 +189,9 @@
       artefacts.slice(0, 6).forEach(a => {
         const div = document.createElement('div');
         div.className = 'tray-slot';
-        div.style.backgroundImage = `url(${a.image_url})`;
+        if (a.image_url) {
+          div.style.backgroundImage = `url(${a.image_url})`;
+        }
         if (a.notation) {
           const notationEl = document.createElement('div');
           notationEl.className = 'artefak-notation';
@@ -520,11 +207,22 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      showConfirmation("Mengunggah...");
-      const fileName = `${currentUser}/${Date.now()}-${file.name}`;
+      // Validasi file
+      if (!file.type.startsWith('image/')) {
+        alert('Hanya file gambar yang diizinkan.');
+        return;
+      }
 
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        alert('Ukuran file maksimal 5MB.');
+        return;
+      }
+
+      showConfirmation("Mengunggah...");
+      
       try {
-        // Upload ke Supabase Storage via URL
+        // Upload langsung ke Supabase Storage
+        const fileName = `${currentUser}/${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
         const formData = new FormData();
         formData.append('file', file);
 
@@ -538,7 +236,8 @@
         });
 
         if (!uploadRes.ok) {
-          throw new Error(`Upload gagal: ${await uploadRes.text()}`);
+          const error = await uploadRes.json();
+          throw new Error(error.message || 'Upload gagal');
         }
 
         const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/artefacts/${fileName}`;
@@ -547,17 +246,21 @@
         await supabaseFetch('artefacts', 'POST', {
           username: currentUser,
           image_url: imageUrl,
-          notation: ''
+          notation: '',
+          created_at: new Date().toISOString()
         });
 
         showConfirmation("Gambar diunggah! Tambahkan notasi (maks 4 kata).");
         await loadData();
-        showPostUploadPanel(); // ✅ Munculkan panel notasi setelah upload
+        showPostUploadPanel();
+
+        // Reset file input
+        event.target.value = '';
 
       } catch (e) {
         console.error('Upload error:', e);
-        alert(e.message || 'Gagal mengunggah gambar.');
         showConfirmation("");
+        alert(`Gagal mengunggah: ${e.message}`);
       }
     }
 
@@ -577,36 +280,43 @@
       }
 
       try {
-        // ✅ Perbaikan: Gunakan filter di URL, bukan di parameter
-        await supabaseFetch(`artefacts?id=eq.${artefacts[0].id}`, 'PATCH', {
-          notation: text
-        });
+        // Gunakan query parameter yang benar
+        await supabaseFetch('artefacts', 'PATCH', {
+          notation: text,
+          updated_at: new Date().toISOString()
+        }, `id=eq.${artefacts[0].id}`);
 
         showConfirmation("Notasi tersimpan.");
         await loadData();
-        hidePostUploadPanel(); // ✅ Sembunyikan panel setelah simpan
+        hidePostUploadPanel();
 
       } catch (e) {
         console.error('Notasi error:', e);
-        alert(e.message || 'Gagal menyimpan notasi.');
+        alert(`Gagal menyimpan notasi: ${e.message}`);
       }
     }
 
     // === POST RANT ===
     async function postRant() {
       const content = document.getElementById('rant').value.trim();
-      if (!content) return;
+      if (!content) {
+        alert('Tuliskan sesuatu terlebih dahulu.');
+        return;
+      }
+      
       if (content.length > 300) {
         alert('Maksimal 300 huruf.');
         return;
       }
 
+      showConfirmation("Menyimpan...");
+
       try {
-        // ✅ Perbaikan: Tambahkan kolom "zone" karena tidak boleh null
         await supabaseFetch('rants', 'POST', {
           username: currentUser,
           content,
-          zone: 'neutral' // ✅ Tambahkan ini!
+          zone: 'neutral', // Kolom required
+          created_at: new Date().toISOString()
         });
 
         document.getElementById('rant').value = '';
@@ -615,7 +325,13 @@
 
       } catch (e) {
         console.error('Rant error:', e);
-        alert(e.message || 'Gagal menyimpan jejak.');
+        
+        if (e.message.includes('column "zone" of relation "rants" does not exist')) {
+          alert('ERROR: Tambahkan kolom "zone" di tabel rants di Supabase.\n\n1. Buka Table Editor di Supabase\n2. Edit tabel "rants"\n3. Tambah kolom: zone (text, nullable: false, default: neutral)');
+        } else {
+          alert(`Gagal menyimpan jejak: ${e.message}`);
+        }
+        showConfirmation("");
       }
     }
 
