@@ -1,153 +1,254 @@
-<!-- File: saynope.html -->
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SayNOPE — NOPE</title>
-  <link rel="stylesheet" href="style.css">
+  <title>NOPE — SayNOPE</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
-    .header {
-      padding: 20px 20px 12px;
-      text-align: center;
-      position: relative;
+    :root,
+    [data-theme="dark"] {
+      --bg: #000;
+      --surface: #0a0a0a;
+      --border: #1f1f1f;
+      --text: #f5f5f5;
+      --muted: #555;
+      --accent: #4903fc;
+      --logo-color: #ff9999;
     }
-    .tagline {
+    [data-theme="hackers"] {
+      --bg: #000;
+      --surface: #001100;
+      --border: #003300;
+      --text: #00ff00;
+      --muted: #00aa00;
+      --accent: #00ff44;
+      --logo-color: #00ff88;
+      font-family: 'Courier New', monospace !important;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(ellipse at top, var(--surface), var(--bg));
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
-      color: #ff9999;
-      margin-top: 6px;
-      font-weight: 500;
+      line-height: 1.5;
+      padding-bottom: 72px;
+      -webkit-font-smoothing: antialiased;
     }
-    .feed {
-      padding: 0 20px;
+    .wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
     }
-    .rant-with-comment {
-      position: relative;
-      padding-bottom: 24px;
-    }
-    .comment-section {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #222;
-    }
-    .emoji-bar {
+    header {
+      position: sticky;
+      top: 0;
+      background: #000000cc;
+      backdrop-filter: blur(6px);
+      padding: 12px 0;
       display: flex;
-      gap: 16px;
-      margin-top: 10px;
-      font-size: 18px;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
     }
-    .emoji-btn {
+    .logo {
+      font-family: 'Manrope', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--logo-color);
+      margin-left: 16px;
+    }
+    .top-right {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+    }
+    .nav-mini {
+      display: flex;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-right: 8px;
+    }
+    .nav-mini span {
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 2px;
+    }
+    .nav-mini span:hover {
+      color: var(--text);
+    }
+    .settings-btn {
       background: none;
       border: none;
-      color: #666;
+      color: var(--muted);
+      font-size: 20px;
       cursor: pointer;
-      transition: transform 0.2s;
+      transform: rotate(90deg);
     }
-    .emoji-btn.active {
-      color: #343deb;
-      transform: scale(1.2);
+    .greeting {
+      font-size: 16px;
+      margin: 20px 0 24px 0;
+      color: var(--text);
     }
-    .comment-input {
-      margin-top: 12px;
-      width: 100%;
-      padding: 10px;
-      font-size: 14px;
+
+    /* === CARD STYLE === */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
     }
-    .comment-list {
-      margin-top: 12px;
-      font-size: 14px;
-      color: #aaa;
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
     }
-    .empty-state {
+    .card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .card-icon {
+      font-size: 18px;
+    }
+
+    .tagline {
       text-align: center;
-      padding: 60px 20px;
-      color: #666;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 0 16px 20px;
+      line-height: 1.5;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .tagline strong {
+      color: var(--accent);
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* === RITUAL: PULSE === */
+    .pulse-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(73, 3, 252, 0.1);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 1000;
+      animation: pulse 1.2s ease-out;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.8); opacity: 0.7; }
+      100% { transform: scale(1.8); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div>SayNOPE</div>
-    <div class="tagline">Kamu ga aneh, sistemnya yang broken!</div>
-  </div>
-
-  <div class="feed" id="feed">
-    <p style="text-align:center; padding:40px; color:#666;">Memuat...</p>
-  </div>
-
-  <script type="module" src="js/supabaseClient.js"></script>
-  <script type="module">
-    import { supabase } from './js/supabaseClient.js';
-
-    const currentUser = localStorage.getItem('nope_username') || 'anonymous';
-
-    loadSayNOPEFeed();
-
-    async function loadSayNOPEFeed() {
-      // Ambil semua rant yang mengandung #Rant (case-insensitive)
-      const { data, error } = await supabase
-        .from('rants')
-        .select('*')
-        .ilike('content', '%#Rant%')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      const feedEl = document.getElementById('feed');
-      if (error || !data?.length) {
-        feedEl.innerHTML = `
-          <div class="empty-state">
-            Belum ada yang berani #Rant.<br>
-            Jadilah yang pertama.
-          </div>
-        `;
-        return;
-      }
-
-      feedEl.innerHTML = data.map(rant => `
-        <div class="rant-card rant-with-comment">
-          <div style="font-size:12px; color:#666;">@${rant.username}</div>
-          <div style="margin:8px 0;">${rant.content}</div>
-          <div style="font-size:12px; color:#666; margin-top:8px;">
-            ${new Date(rant.created_at).toLocaleDateString('id-ID')}
-          </div>
-
-          <!-- Emoji reaction (4 jenis) -->
-          <div class="emoji-bar">
-            <button class="emoji-btn" onclick="react('${rant.id}', 'cowboy')">😎</button>
-            <button class="emoji-btn" onclick="react('${rant.id}', 'nangis')">😭</button>
-            <button class="emoji-btn" onclick="react('${rant.id}', 'peluk')">🤗</button>
-            <button class="emoji-btn" onclick="react('${rant.id}', 'api')">🔥</button>
-          </div>
-
-          <!-- Komentar (hanya di SayNOPE) -->
-          <div class="comment-section">
-            <input type="text" class="comment-input" placeholder="Balas dengan suara..." 
-                   onkeypress="handleComment(event, '${rant.id}')"/>
-            <div class="comment-list" id="comments-${rant.id}">
-              <!-- Komentar akan di-load di sini (opsional, bisa di-expand nanti) -->
-            </div>
-          </div>
+  <div class="wrapper">
+    <header>
+      <div class="logo">NOPE</div>
+      <div class="top-right">
+        <div class="nav-mini">
+          <span id="nav-jejak">Jejak</span>
+          <span id="nav-frekuensi">Frekuensi</span>
+          <span id="nav-saynope">SayNOPE</span>
+          <span id="nav-glitch">GLITCH</span>
         </div>
-      `).join('');
+        <button class="settings-btn" id="settings-btn">⋯</button>
+      </div>
+    </header>
+
+    <div class="greeting">Hello @<span id="username-display"></span></div>
+
+    <div class="card" id="rant-thread">
+      <h3><span class="card-icon">💬</span> Rant Thread</h3>
+      <p>Buat diskusi terbuka dengan 1 tag (#skripsi, #toxicboss). Semua bisa komentar & kirim 🔥, 🫂, ✊.</p>
+    </div>
+
+    <div class="card" id="petisi">
+      <h3><span class="card-icon">✊</span> Petisi</h3>
+      <p>Mulai atau dukung gerakan nyata. Tanda tangan digital, sebar ke yang sefrekuensi.</p>
+    </div>
+
+    <div class="card" id="solidaritas">
+      <h3><span class="card-icon">🤝</span> Solidaritas</h3>
+      <p>Kirim dukungan moral atau materi untuk sesama yang sedang berjuang.</p>
+    </div>
+
+    <div class="card" id="zine">
+      <h3><span class="card-icon">📓</span> Zine & Arsip</h3>
+      <p>Kontribusi tulisan, artefak, atau ide untuk arsip budaya generasi.</p>
+    </div>
+
+    <div class="tagline">
+      Kamu ga aneh.<br>
+      Sistemnya yang broken!<br>
+      <strong>— Glitch Generation</strong>
+    </div>
+  </div>
+
+  <script>
+    // === STATE ===
+    const currentUser = localStorage.getItem('nope_username');
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    }
+    document.getElementById('username-display').textContent = currentUser;
+
+    // === NAVIGASI ===
+    function navigateTo(page) {
+      window.location.href = page;
     }
 
-    // Fungsi reaksi emoji (placeholder — bisa disimpan ke tabel reactions)
-    function react(rantId, emojiType) {
-      console.log(`User ${currentUser} reacted with ${emojiType} to rant ${rantId}`);
-      alert(`Fitur reaksi akan disimpan di update berikutnya. Terima kasih sudah bersuara 💙`);
-    }
-
-    // Fungsi komentar (placeholder)
-    function handleComment(e, rantId) {
-      if (e.key === 'Enter') {
-        const text = e.target.value.trim();
-        if (text) {
-          console.log(`Komentar dari ${currentUser}: ${text} pada rant ${rantId}`);
-          alert(`Komentar akan aktif di versi lengkap. Kamu sudah berani — itu yang utama.`);
-          e.target.value = '';
-        }
+    function logout() {
+      if (confirm('Keluar dari akun?')) {
+        localStorage.removeItem('nope_username');
+        window.location.href = 'index.html';
       }
     }
+
+    // === RITUAL: PULSE ===
+    function triggerPulse() {
+      const pulse = document.createElement('div');
+      pulse.className = 'pulse-animation';
+      document.body.appendChild(pulse);
+      setTimeout(() => pulse.remove(), 1200);
+    }
+
+    // === INIT ===
+    document.addEventListener('DOMContentLoaded', () => {
+      // Navigasi halaman
+      document.getElementById('nav-jejak').onclick = () => navigateTo('jejak.html');
+      document.getElementById('nav-frekuensi').onclick = () => navigateTo('frekuensi.html');
+      document.getElementById('nav-saynope').onclick = () => navigateTo('saynope.html');
+      document.getElementById('nav-glitch').onclick = () => navigateTo('glitch.html');
+      document.getElementById('settings-btn').onclick = logout;
+
+      // Card actions
+      document.getElementById('rant-thread').onclick = () => navigateTo('saynope-thread.html');
+      document.getElementById('petisi').onclick = () => navigateTo('saynope-petisi.html');
+      document.getElementById('solidaritas').onclick = () => navigateTo('saynope-solidaritas.html');
+      document.getElementById('zine').onclick = () => navigateTo('saynope-zine.html');
+
+      // Pulse
+      triggerPulse();
+    });
   </script>
 </body>
 </html>
