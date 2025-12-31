@@ -1,93 +1,276 @@
-<!-- File: glitch.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GLITCH — NOPE</title>
+  <title>NOPE — GLITCH</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .header {
-      padding: 20px 20px 12px;
-      text-align: center;
+    /* === Override & Tambah untuk GLITCH === */
+    .pick-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+      position: relative;
     }
-    .section {
-      padding: 0 20px 24px;
-    }
-    .section-title {
-      font-size: 16px;
-      margin: 24px 0 12px;
-      color: #343deb;
-    }
-    .card {
-      background: rgba(255,255,255,0.03);
-      padding: 16px;
+
+    .pick-image {
+      width: 100%;
+      height: auto;
       border-radius: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .pick-title {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .quote {
+      background: rgba(73,3,252,0.15);
+      border-left: 3px solid var(--accent);
+      padding: 16px;
+      margin: 20px 0;
+      font-style: italic;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .signature {
+      margin-top: 20px;
+      font-style: italic;
+      color: var(--muted);
       font-size: 14px;
     }
-    .lock-icon {
-      display: inline-block;
-      background: #333;
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
+
+    .tagline {
       text-align: center;
-      line-height: 20px;
       font-size: 12px;
-      margin-right: 6px;
+      color: var(--muted);
+      padding: 0 16px 20px;
+      line-height: 1.5;
+      max-width: 320px;
+      margin: 0 auto 32px;
     }
-    .notice {
-      text-align: center;
-      padding: 30px 20px;
-      color: #666;
-      line-height: 1.6;
+
+    .tagline strong {
+      color: var(--accent);
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* === Hover micro-movement === */
+    .pick-card:hover {
+      transform: translateY(-2px);
+      transition: transform 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div>GLITCH</div>
-  </div>
+  <div class="wrapper">
+    <header>
+      <div class="logo">NOPE</div>
+      <div class="top-right">
+        <button class="settings-btn" onclick="goTo('glitch.html')">⋯</button>
+        <div class="nav-mini">
+          <span onclick="goTo('jejak.html')">Jejak</span>
+          <span onclick="goTo('frekuensi.html')">Frekuensi</span>
+          <span onclick="goTo('saynope.html')">SayNOPE</span>
+          <span onclick="goTo('glitch.html')">GLITCH</span>
+        </div>
+      </div>
+    </header>
 
-  <div class="section">
-    <div class="section-title">Gerakan</div>
-    <div class="card">Solidaritas Petisi → <a href="saynope-petisi.html">Lihat</a></div>
-    <div class="card">Zine Digital → <a href="saynope-zine.html">Baca</a></div>
-  </div>
+    <div class="greeting">Hello @<span id="username-display"></span></div>
 
-  <div class="section">
-    <div class="section-title">Picks</div>
-    <div class="card">Pilihan Editor → <a href="glitch-picks.html">Jelajahi</a></div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Wawancara</div>
-    <div class="card">Suara dari Mereka → <a href="glitch-wawancara.html">Dengar</a></div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Hangouts</div>
-    <div class="card">
-      <span class="lock-icon">🔒</span>
-      Akses penuh butuh verifikasi email (hanya jika aktif ≥6 bulan)
+    <!-- Artikel 1: Film -->
+    <div class="pick-card">
+      <img src="https://placehold.co/600x400/1a1a1a/ffffff?text=Reza+Rahadian" alt="Ilustrasi Reza Rahadian" class="pick-image">
+      <div class="pick-title">Reza Rahadian dan Ilusi Kesempurnaan</div>
+      <span class="meta">Untuk yang lelah berakting jadi kuat</span>
+      
+      <p>“Kita memuji senyumnya — tapi lupa bertanya:<br>Di mana dia menangis?”</p>
+      
+      <p>Reza Rahadian bukan aktor. Ia <strong>cermin zaman yang takut retak</strong>.<br>
+      Setiap perannya — dari Soekarno sampai pengusaha muda —<br>
+      disajikan dengan <strong>senyum yang terlalu sempurna</strong>,<br>
+      seperti kopi instan:<br>
+      <em>Hangat, tapi tak pernah benar-benar membakar tenggorokan.</em></p>
+      
+      <p>Padahal, <strong>akting yang hidup lahir dari kegagalan</strong> —<br>
+      bukan dari skenario yang rapi.<br>
+      Lihat <strong>Laura Basuki di “Istirahatlah Kata-Kata”</strong>:<br>
+      Matanya bergetar sebelum bicara.<br>
+      Tubuhnya menciut di sudut ruang.<br>
+      Ia tidak <em>berakting sedih</em> — ia <strong>menjadi sedih</strong>.</p>
+      
+      <p>Reza? Ia <strong>berakting jadi manusia</strong>,<br>
+      tapi lupa jadi manusia yang rapuh.</p>
+      
+      <blockquote class="quote">
+        Ini bukan kritik pada Reza —<br>
+        ini teriakan untuk diri kita sendiri:<br>
+        Kapan terakhir kali kita berani tampil rapuh?
+      </blockquote>
+      
+      <p>Kalau kamu pernah pura-pura baik di depan keluarga,<br>
+      sambil nahan nangis di kamar mandi,<br>
+      maka kamu tahu:<br>
+      <strong>Kesempurnaan itu bukan kekuatan — itu penjara.</strong></p>
+      
+      <p>Dan mungkin,<br>
+      Reza juga butuh izin untuk<br>
+      <strong>tidak sempurna.</strong></p>
+      
+      <div class="signature">— @HD, 1% petani 99% failure...</div>
     </div>
-    <div class="notice">
-      GLITCH adalah ruang untuk yang sudah lama berjalan bersama NOPE.<br>
-      Jika kamu sudah 6 bulan di sini, <a href="#" onclick="requestVerification()">klik di sini</a> untuk verifikasi.
+
+    <!-- Artikel 2: Musik -->
+    <div class="pick-card">
+      <img src="https://placehold.co/600x400/1a1a1a/ffffff?text=Hindia+-+Besok+Lusa+Nanti" alt="Ilustrasi Hindia" class="pick-image">
+      <div class="pick-title">Hindia: Lagu untuk yang Lelah Menunggu</div>
+      <span class="meta">Untuk yang janji “nanti” tapi hidupnya mandek</span>
+      
+      <p>“Kita terlalu sibuk mengejar ‘besok’<br>
+      sampai lupa hidup hari ini.”</p>
+      
+      <p>“Besok, Lusa, Nanti” bukan lagu.<br>
+      Ia <strong>terapi kolektif untuk generasi yang hidup di masa depan</strong>.</p>
+      
+      <p>Setiap baitnya menusuk:<br>
+      <em>“Kita janji bertemu di masa depan,<br>
+      Tapi masa depan tak pernah datang.”</em></p>
+      
+      <p>Di tengah lagu-lagu yang menyanyikan:<br>
+      <em>“Nanti kita sukses!”<br>
+      “Besok semua akan indah!”</em><br>
+      Hindia berani bilang:<br>
+      <strong>“Aku capek menunggu.”</strong></p>
+      
+      <p><strong>Musiknya</strong>?<br>
+      - Hanya piano dan vokal yang retak<br>
+      - Tidak ada synth mahal, tidak ada beat viral<br>
+      - Hanya <strong>detak jantung yang lelah</strong></p>
+      
+      <blockquote class="quote">
+        Ini lagu untuk yang pernah bilang:<br>
+        “Gue nungguin dia berubah.”<br>
+        Tapi yang berubah justru gue — jadi lebih kosong.
+      </blockquote>
+      
+      <p>Kalau kamu pernah menunda hidupmu dengan alasan:<br>
+      <em>“Nanti kalau punya duit…”<br>
+      “Nanti kalau udah lulus…”</em><br>
+      Maka dengarkan ini:<br>
+      <strong>Masa depan tidak akan pernah datang.<br>
+      Yang ada hanya hari ini —<br>
+      dan kamu sedang melewatinya sambil menunggu.</strong></p>
+      
+      <div class="signature">— @HD, 1% petani 99% failure...</div>
+    </div>
+
+    <!-- Artikel 3: Buku -->
+    <div class="pick-card">
+      <img src="https://placehold.co/600x400/1a1a1a/ffffff?text=Madilog+Tan+Malaka" alt="Ilustrasi Buku Madilog" class="pick-image">
+      <div class="pick-title">Madilog: Senjata untuk yang Takut Berpikir</div>
+      <span class="meta">Untuk yang lelah dikasih tahu “ikut aja”</span>
+      
+      <p>“Di era algoritma,<br>
+      berani berpikir sendiri adalah bentuk perlawanan.”</p>
+      
+      <p>Tan Malaka tidak menulis buku.<br>
+      Ia menulis <strong>panggilan untuk berani sendiri</strong>.</p>
+      
+      <p><strong>Madilog</strong> (Materialisme, Dialektika, Logika)<br>
+      bukan teori — tapi <strong>alat untuk menghancurkan kebohongan</strong>.</p>
+      
+      <p>Yang mengejutkan?<br>
+      Ia menulis ini di <strong>penjara kolonial</strong>,<br>
+      tempat paling tidak bebas,<br>
+      tapi justru menghasilkan <strong>pikiran paling bebas</strong>.</p>
+      
+      <p>Sementara kita?<br>
+      Diberi kebebasan,<br>
+      tapi takut berpikir,<br>
+      karena takut salah.</p>
+      
+      <blockquote class="quote">
+        “Seorang pejuang harus berani sendiri.<br>
+        Karena kebenaran seringkali lahir di tempat yang sepi.”
+      </blockquote>
+      
+      <p>Kalimat ini bukan puisi.<br>
+      Ini <strong>tantangan</strong>:<br>
+      Apakah kamu berani mempertanyakan apa yang dikasih orang?</p>
+      
+      <p>Kalau kamu pernah ngerasa:<br>
+      <em>“Kenapa gue harus nurut tanpa boleh nanya?”</em><br>
+      Maka Madilog bukan bacaan —<br>
+      ia <strong>senjata</strong>.</p>
+      
+      <p>Dan Tan Malaka bukan penulis —<br>
+      ia <strong>pelatih berpikir</strong>.</p>
+      
+      <div class="signature">— @HD, 1% petani 99% failure...</div>
+    </div>
+
+    <!-- Artikel 4: Hangouts (Konten Budaya Harian) -->
+    <div class="pick-card">
+      <img src="https://placehold.co/600x400/1a1a1a/ffffff?text=Hangouts:+Ngopi+di+Warung+Pinggir+Jalan" alt="Ilustrasi hangout santai" class="pick-image">
+      <div class="pick-title">Ngopi di Warung Pinggir Jalan: Ritual Tanpa Caption</div>
+      <span class="meta">Untuk yang lelah performa eksistensial</span>
+      
+      <p>Tidak ada filter. Tidak ada story.<br>
+      Hanya dua gelas kopi, rokok setengah, dan obrolan yang nyasar ke masa kecil.</p>
+      
+      <p>Ini bukan “quality time”.<br>
+      Ini <strong>ruang di mana kamu boleh diam tanpa dianggap aneh</strong>.</p>
+      
+      <p>Di media sosial, kita diminta:<br>
+      <em>“Be yourself!”</em><br>
+      Tapi di warung pinggir jalan,<br>
+      kamu <strong>tidak perlu jadi apa-apa</strong>.</p>
+      
+      <blockquote class="quote">
+        Di tempat ini, kamu tidak “on brand”.<br>
+        Kamu cuma… ada.
+      </blockquote>
+      
+      <p>Mungkin inilah bentuk perlawanan terkecil:<br>
+      <strong>menolak jadi konten</strong><br>
+      walau cuma 15 menit sehari.</p>
+      
+      <p>Karena kadang,<br>
+      kebahagiaan itu bukan sesuatu yang bisa diarsip —<br>
+      tapi sesuatu yang <strong>hilang begitu kamu coba foto</strong>.</p>
+      
+      <div class="signature">— @HD, 1% petani 99% failure...</div>
+    </div>
+
+    <div class="tagline">
+      Kami mengarsip yang tak minta diingat —<br>
+      tapi layak dikenang.<br>
+      <strong>— Glitch Generation</strong>
     </div>
   </div>
 
   <script>
-    function requestVerification() {
-      const username = localStorage.getItem('nope_username');
-      if (!username) {
-        alert('Kamu belum login.');
-        return;
-      }
-      // Di versi lengkap: kirim request ke Supabase → kirim email via Resend/Twilio SendGrid
-      alert(`Fitur verifikasi email akan aktif di production.\nSaat ini, kamu bisa eksplor Picks & Wawancara tanpa batas.`);
-    }
+    document.getElementById('username-display').textContent = localStorage.getItem('nope_username') || 'kawan';
+    function goTo(page) { window.location.href = page; }
   </script>
 </body>
 </html>
