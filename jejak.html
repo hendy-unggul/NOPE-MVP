@@ -364,24 +364,30 @@
 
   <input type="file" id="file-input" accept="image/*" style="display:none;">
 
-  <!-- Load Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+  <!-- Load Supabase via script tag -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase-js.min.js"></script>
 
   <script>
+    // === CHECK SUPABASE ===
     if (typeof supabase === 'undefined') {
-      alert('Gagal memuat Supabase.');
       console.error('Supabase tidak terload!');
+      alert('Gagal memuat Supabase. Coba refresh.');
     }
 
     const currentUser = localStorage.getItem('nope_username');
-    if (!currentUser) window.location.href = 'index.html';
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    }
     document.getElementById('username-display').textContent = currentUser;
 
-    let artefacts = [], rants = [];
+    let artefacts = [];
+    let rants = [];
+
     const heroImg = document.getElementById('hero-img');
     const heroNotationDisplay = document.getElementById('hero-notation-display');
     const postUploadPanel = document.getElementById('post-upload-panel');
 
+    // === UTILS ===
     function showConfirmation(msg) {
       const el = document.getElementById('confirmation');
       el.textContent = msg;
@@ -389,7 +395,7 @@
     }
 
     function validateNotation(text) {
-      const words = text.trim().split(/\s+/).filter(w => w);
+      const words = text.trim().split(/\s+/).filter(w => w.length > 0);
       return words.length >= 1 && words.length <= 4;
     }
 
@@ -403,6 +409,7 @@
       postUploadPanel.classList.add('hidden');
     }
 
+    // === DATABASE: pastikan user ada ===
     async function ensureUserExists() {
       try {
         const { data, error } = await supabase
@@ -410,6 +417,7 @@
           .select('username')
           .eq('username', currentUser)
           .single();
+
         if (error && error.code === 'PGRST116') {
           await supabase.from('users').insert({ username: currentUser });
         }
@@ -418,36 +426,52 @@
       }
     }
 
+    // === MUAT DATA ===
     async function loadData() {
       try {
         await ensureUserExists();
 
+        // Load artefacts
         const { data: artefactsData, error: artefactsError } = await supabase
           .from('artefacts')
           .select('*')
           .eq('username', currentUser)
           .order('created_at', { ascending: false })
           .limit(6);
-        artefacts = artefactsError ? [] : artefactsData || [];
 
+        if (artefactsError) {
+          console.error('Gagal muat artefak:', artefactsError);
+          artefacts = [];
+        } else {
+          artefacts = artefactsData || [];
+        }
+
+        // Load rants
         const { data: rantsData, error: rantsError } = await supabase
           .from('rants')
           .select('*')
           .eq('username', currentUser)
           .order('created_at', { ascending: false })
           .limit(5);
-        rants = rantsError ? [] : rantsData || [];
+
+        if (rantsError) {
+          console.error('Gagal muat rant:', rantsError);
+          rants = [];
+        } else {
+          rants = rantsData || [];
+        }
 
         renderHero();
         renderDiary();
         renderTray();
 
       } catch (e) {
-        console.error('Error load data:', e);
-        showConfirmation("Gagal memuat data.");
+        console.error('Error saat load data:', e);
+        showConfirmation("Gagal memuat data. Coba refresh.");
       }
     }
 
+    // === RENDER ===
     function renderHero() {
       if (artefacts.length > 0) {
         heroImg.src = artefacts[0].image_url;
@@ -463,10 +487,12 @@
     function renderDiary() {
       const container = document.getElementById('diary');
       container.innerHTML = '';
+
       if (rants.length === 0) {
         container.innerHTML = '<div class="empty-state">Belum ada jejak. Tinggalkan jejak pertamamu!</div>';
         return;
       }
+
       rants.forEach(r => {
         const entry = document.createElement('div');
         entry.className = 'diary-entry';
@@ -479,10 +505,12 @@
     function renderTray() {
       const tray = document.getElementById('tray');
       tray.innerHTML = '';
+
       if (artefacts.length === 0) {
         tray.innerHTML = '<div class="empty-state">Belum ada artefak. Unggah gambar pertamamu!</div>';
         return;
       }
+
       artefacts.slice(0, 6).forEach(a => {
         const div = document.createElement('div');
         div.className = 'tray-slot';
@@ -497,6 +525,7 @@
       });
     }
 
+    // === UPLOAD ARTEFAK BARU ===
     async function handleFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -508,7 +537,10 @@
         const { error: uploadError } = await supabase.storage
           .from('artefacts')
           .upload(fileName, file);
-        if (uploadError) throw new Error(uploadError.message);
+
+        if (uploadError) {
+          throw new Error(`Upload gagal: ${uploadError.message}`);
+        }
 
         const { data } = supabase.storage.from('artefacts').getPublicUrl(fileName);
         const imageUrl = data.publicUrl;
@@ -516,11 +548,14 @@
         const { error: dbError } = await supabase
           .from('artefacts')
           .insert({ username: currentUser, image_url: imageUrl, notation: '' });
-        if (dbError) throw new Error(dbError.message);
+
+        if (dbError) {
+          throw new Error(`Simpan ke DB gagal: ${dbError.message}`);
+        }
 
         showConfirmation("Gambar diunggah! Tambahkan notasi (maks 4 kata).");
         await loadData();
-        showPostUploadPanel();
+        showPostUploadPanel(); // ✅ Munculkan panel notasi setelah upload
 
       } catch (e) {
         console.error('Upload error:', e);
@@ -529,11 +564,20 @@
       }
     }
 
+    // === SIMPAN NOTASI ===
     async function saveNotation() {
       const input = document.getElementById('hero-notation');
       const text = input.value.trim();
-      if (!validateNotation(text)) return alert('Notasi harus 1–4 kata.');
-      if (artefacts.length === 0) return alert('Belum ada artefak.');
+
+      if (!validateNotation(text)) {
+        alert('Notasi harus 1–4 kata.');
+        return;
+      }
+
+      if (artefacts.length === 0) {
+        alert('Belum ada artefak.');
+        return;
+      }
 
       try {
         const { error } = await supabase
@@ -541,11 +585,14 @@
           .update({ notation: text })
           .eq('username', currentUser)
           .eq('image_url', artefacts[0].image_url);
-        if (error) throw new Error(error.message);
+
+        if (error) {
+          throw new Error(`Gagal simpan notasi: ${error.message}`);
+        }
 
         showConfirmation("Notasi tersimpan.");
         await loadData();
-        hidePostUploadPanel();
+        hidePostUploadPanel(); // ✅ Sembunyikan panel setelah simpan
 
       } catch (e) {
         console.error('Notasi error:', e);
@@ -553,17 +600,23 @@
       }
     }
 
+    // === POST RANT ===
     async function postRant() {
       const content = document.getElementById('rant').value.trim();
       if (!content) return;
-      if (content.length > 300) return alert('Maksimal 300 huruf.');
+      if (content.length > 300) {
+        alert('Maksimal 300 huruf.');
+        return;
+      }
 
       try {
-        // ✅ TANPA ZONE — biarkan algoritma Frekuensi yang tentukan
         const { error } = await supabase
           .from('rants')
-          .insert({ username: currentUser, content });
-        if (error) throw new Error(error.message);
+          .insert({ username: currentUser, content }); // ✅ TANPA ZONE
+
+        if (error) {
+          throw new Error(`Gagal simpan rant: ${error.message}`);
+        }
 
         document.getElementById('rant').value = '';
         showConfirmation("Jejakmu tersimpan.");
@@ -575,7 +628,11 @@
       }
     }
 
-    function nav(page) { window.location.href = page; }
+    // === NAVIGASI & LOGOUT ===
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
     function logout() {
       if (confirm('Keluar dari akun?')) {
         localStorage.removeItem('nope_username');
@@ -583,28 +640,32 @@
       }
     }
 
-    // === RITUAL: PULSE ===
-    function triggerPulse() {
-      const pulse = document.createElement('div');
-      pulse.className = 'pulse-animation';
-      document.body.appendChild(pulse);
-      setTimeout(() => pulse.remove(), 1200);
-    }
-
+    // === INIT LISTENERS ===
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('upload-artefak-btn').onclick = () => document.getElementById('file-input').click();
-      document.getElementById('file-input').onchange = handleFileSelect;
-      document.getElementById('save-notation-btn').onclick = saveNotation;
-      document.getElementById('hero-notation').onkeypress = (e) => { if (e.key === 'Enter') saveNotation(); };
-      document.getElementById('jejakkan-btn').onclick = postRant;
+      // Upload
+      document.getElementById('upload-artefak-btn').addEventListener('click', () => {
+        document.getElementById('file-input').click();
+      });
+      document.getElementById('file-input').addEventListener('change', handleFileSelect);
 
-      document.getElementById('nav-jejak').onclick = () => nav('jejak.html');
-      document.getElementById('nav-frekuensi').onclick = () => nav('frekuensi.html');
-      document.getElementById('nav-saynope').onclick = () => nav('saynope.html');
-      document.getElementById('nav-glitch').onclick = () => nav('glitch.html');
-      document.getElementById('settings-btn').onclick = logout;
+      // Notasi
+      document.getElementById('save-notation-btn').addEventListener('click', saveNotation);
+      document.getElementById('hero-notation').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') saveNotation();
+      });
 
-      loadData().then(triggerPulse);
+      // Rant
+      document.getElementById('jejakkan-btn').addEventListener('click', postRant);
+
+      // Navigasi
+      document.getElementById('nav-jejak').addEventListener('click', () => navigateTo('jejak.html'));
+      document.getElementById('nav-frekuensi').addEventListener('click', () => navigateTo('frekuensi.html'));
+      document.getElementById('nav-saynope').addEventListener('click', () => navigateTo('saynope.html'));
+      document.getElementById('nav-glitch').addEventListener('click', () => navigateTo('glitch.html'));
+      document.getElementById('settings-btn').addEventListener('click', logout);
+
+      // Load data
+      loadData();
     });
   </script>
 </body>
