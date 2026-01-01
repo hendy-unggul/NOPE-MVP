@@ -1,413 +1,344 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NOPE — Frekuensi</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>NOPE — FREKUENSI</title>
   <style>
-    :root,
-    [data-theme="dark"] {
-      --bg: #000;
-      --surface: #0a0a0a;
-      --border: #1f1f1f;
-      --text: #f5f5f5;
-      --muted: #555;
+    :root {
+      --bg: #fcfcfc;
+      --surface: #ffffff;
+      --text: #121212;
+      --muted: #666666;
+      --border: #e5e5e5;
       --accent: #4903fc;
-      --logo-color: #ff9999;
-    }
-    [data-theme="hackers"] {
-      --bg: #000;
-      --surface: #001100;
-      --border: #003300;
-      --text: #00ff00;
-      --muted: #00aa00;
-      --accent: #00ff44;
-      --logo-color: #00ff88;
-      font-family: 'Courier New', monospace !important;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: radial-gradient(ellipse at top, var(--surface), var(--bg));
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
-      padding-bottom: 72px;
-      -webkit-font-smoothing: antialiased;
-    }
-    .wrapper {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-    header {
-      position: sticky;
-      top: 0;
-      background: #000000cc;
-      backdrop-filter: blur(6px);
-      padding: 12px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
-    }
-    .logo {
-      font-family: 'Manrope', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--logo-color);
-      margin-left: 16px;
-    }
-    .top-right {
-      display: flex;
-      align-items: center;
-      margin-right: 12px;
-    }
-    .nav-mini {
-      display: flex;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--muted);
-      margin-right: 8px;
-    }
-    .nav-mini span {
-      cursor: pointer;
-      text-decoration: underline;
-      text-decoration-style: dotted;
-      text-underline-offset: 2px;
-    }
-    .nav-mini span:hover {
-      color: var(--text);
-    }
-    .settings-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 20px;
-      cursor: pointer;
-      transform: rotate(90deg);
-    }
-    .greeting {
-      font-size: 16px;
-      margin: 20px 0 24px 0;
-      color: var(--text);
-    }
-    .zones {
-      margin-bottom: 32px;
-    }
-    .zone-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .zone-post-container {
-      margin: 10px 0;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    .zone-post-container:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-    .zone-post {
-      font-size: 13px;
-      color: var(--text);
-      line-height: 1.4;
-    }
-    .post-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 4px;
-    }
-    .post-username {
-      color: var(--muted);
-      font-weight: 600;
-      font-size: 12px;
-    }
-    .post-emoji {
-      color: var(--muted);
-      font-size: 14px;
-      opacity: 0.7;
-    }
-    .post-content {
-      color: var(--text);
-      font-size: 13px;
-    }
-    .zone-icon {
-      font-size: 18px;
-      margin-bottom: 8px;
-    }
-    .zone-title {
-      margin-bottom: 4px;
-      font-size: 16px;
-      font-weight: 600;
-    }
-    .zone-description {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 12px;
-    }
-    .zone-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 0 0 12px 0;
-    }
-    .tagline {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 0 16px 20px;
-      line-height: 1.5;
-      max-width: 320px;
-      margin: 0 auto;
-    }
-    .tagline strong {
-      color: var(--accent);
-      display: block;
-      margin-top: 4px;
-    }
-    .empty-zone {
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
-      padding: 12px 0;
+      --hype: #ff6b9d;
+      --ngusahain: #4ade80;
+      --spill: #fbbf24;
+      --hangout: #60a5fa;
     }
 
-    /* === RITUAL: PULSE === */
-    .pulse-animation {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(73, 3, 252, 0.1);
-      pointer-events: none;
-      opacity: 0;
-      z-index: 1000;
-      animation: pulse 1.2s ease-out;
+    * { box-sizing: border-box; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      padding-bottom: 32px;
     }
-    @keyframes pulse {
-      0% { transform: scale(0.8); opacity: 0.7; }
-      100% { transform: scale(1.8); opacity: 0; }
+
+    .wrapper {
+      padding: 0 16px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 0 16px;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .zone-tabs {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .zone-tabs::-webkit-scrollbar { display: none; }
+
+    .zone-tab {
+      white-space: nowrap;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .zone-tab.active, .zone-tab:hover {
+      color: white;
+    }
+
+    .zone-tab[data-zone="all"] { background: var(--accent); color: white; }
+    .zone-tab[data-zone="hype"] { background: var(--hype); color: white; }
+    .zone-tab[data-zone="ngusahain"] { background: var(--ngusahain); color: black; }
+    .zone-tab[data-zone="spill"] { background: var(--spill); color: black; }
+    .zone-tab[data-zone="hangout"] { background: var(--hangout); color: white; }
+
+    .hangout-filters {
+      display: none;
+      gap: 12px;
+      margin: 12px 0 20px;
+      flex-wrap: wrap;
+    }
+    .hangout-filters.active {
+      display: flex;
+    }
+
+    .filter-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: var(--hangout);
+      color: white;
+      border-color: var(--hangout);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+      line-height: 1.55;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .card-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .price-tag {
+      background: #f0f0f0;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .zone-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      color: white;
+    }
+    .zone-badge.hangout { background: var(--hangout); }
+
+    .promo-badge {
+      background: #ff6b9d;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    .response-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .emoji-btn, .comment-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+    .emoji-btn:hover, .comment-btn:hover {
+      opacity: 1;
+    }
+
+    .greeting {
+      font-size: 18px;
+      margin: 4px 0 16px;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
+  <!-- Redirect jika belum login -->
+  <script>
+    if (!localStorage.getItem('nope_onboarded')) {
+      window.location.href = 'login.html';
+    }
+  </script>
+
   <div class="wrapper">
     <header>
       <div class="logo">NOPE</div>
-      <div class="top-right">
-        <div class="nav-mini">
-          <span id="nav-jejak">Jejak</span>
-          <span id="nav-frekuensi">Frekuensi</span>
-          <span id="nav-saynope">SayNOPE</span>
-          <span id="nav-glitch">GLITCH</span>
-        </div>
-        <button class="settings-btn" id="settings-btn">⋯</button>
-      </div>
+      <button onclick="window.location.href='login.html'" style="background:none;border:none;font-size:24px;">⋯</button>
     </header>
 
     <div class="greeting">Hello @<span id="username-display"></span></div>
 
-    <!-- Hype Haus -->
-    <div class="zones">
-      <div class="zone-item" id="zone-hype">
-        <div class="zone-icon">🎧</div>
-        <div class="zone-content">
-          <h3 class="zone-title">Hype Haus</h3>
-          <p class="zone-description">“Tempat nge-hype idol, drakor, atau AU tanpa takut di-spill.”</p>
-          <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
-        </div>
-      </div>
-
-      <!-- Ngusahain -->
-      <div class="zone-item" id="zone-ngusahain">
-        <div class="zone-icon">💼</div>
-        <div class="zone-content">
-          <h3 class="zone-title">Ngusahain</h3>
-          <p class="zone-description">“Cerita progress lo: dari skripsi sampe jualan thrifting.”</p>
-          <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
-        </div>
-      </div>
-
-      <!-- Spill Zone -->
-      <div class="zone-item" id="zone-spill">
-        <div class="zone-icon">💬</div>
-        <div class="zone-content">
-          <h3 class="zone-title">Spill Zone</h3>
-          <p class="zone-description">“Curhat, ngeluh, atau cuma pengin ngomong — no cap, no jaim.”</p>
-          <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
-        </div>
-      </div>
+    <div class="zone-tabs">
+      <div class="zone-tab active" data-zone="all">Semua</div>
+      <div class="zone-tab" data-zone="hype">Hype Haus</div>
+      <div class="zone-tab" data-zone="ngusahain">Ngusahain</div>
+      <div class="zone-tab" data-zone="spill">Spill Zone</div>
+      <div class="zone-tab" data-zone="hangout">Hangouts</div>
     </div>
 
-    <div class="tagline">
-      Ga perlu follower.<br>
-      Cuma butuh sefrekuensi.<br>
-      <strong>— Glitch Generation</strong>
+    <div class="hangout-filters" id="hangoutFilters">
+      <div class="filter-btn active" data-city="all">Semua Kota</div>
+      <div class="filter-btn" data-city="jakarta">Jakarta</div>
+      <div class="filter-btn" data-city="bandung">Bandung</div>
+      <div class="filter-btn" data-city="yogyakarta">Yogyakarta</div>
     </div>
+
+    <div id="zone-content"><!-- Isi di-generate via JS --></div>
   </div>
 
   <script>
-    // === CONFIG — GANTI INI DENGAN PROYEK & KEY-MU ===
-    const SUPABASE_URL = 'https://fuovfrdicdhnlymnacpz.supabase.co'; // 🔁 GANTI DENGAN PROJECT ID-MU
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b3ZmcmRpY2Robmx5bW5hY3B6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjYxMzEsImV4cCI6MjA4MjYwMjEzMX0.oX4fVTEIWiRG2NaNJJKOV8dTnSHWhicLVMIFzZUl1o0';                 // 🔁 GANTI DENGAN ANON KEY-MU
+    document.getElementById('username-display').textContent = localStorage.getItem('nope_username') || 'kawan';
 
-    // === OLD FASHION WAY — MANUAL FETCH ===
-    async function supabaseFetch(table, method = 'GET', body = null) {
-      const headers = {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      };
+    // Kata kunci zona (non-Hangouts)
+    const hypeKeywords = ['bts','jin','jungkook','drakor','fanart','au','stan'];
+    const ngusahainKeywords = ['ngusahain','progres','belajar','coding','kerja','kuliah'];
+    const spillKeywords = ['spill','curhat','toxic','mantan','depresi','sendiri'];
 
-      let url = `${SUPABASE_URL}/rest/v1/${table}`;
-      let options = { method, headers };
-
-      if (body) options.body = JSON.stringify(body);
-
-      const res = await fetch(url, options);
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-      return await res.json();
-    }
-
-    // === KATA KUNCI ZONA (20-30 per zona) ===
-    const HYPE_KEYWORDS = [
-      'v!', 'v!!!!', 'v', 'kpop', 'skz', 'txt', 'bts', 'seventeen', 'enhypen',
-      'drakor', 'k-drama', 'squid game', 'crash landing', 'kim seon ho',
-      'anime', 'naruto', 'demon slayer', 'one piece', 'gintama',
-      'au', 'alternate universe', 'ship', 'otp', 'stan', 'bias', 'maknae',
-      'comeback', 'music video', 'concert', 'lightstick', 'fanart'
-    ];
-
-    const NGUSAHAIN_KEYWORDS = [
-      'skripsi', 'tugas', 'deadline', 'sidang', 'wisuda', 'kuliah',
-      'jualan', 'thrifting', 'preloved', 'reselling', 'online shop',
-      'crypto', 'bitcoin', 'saham', 'investasi', 'passive income',
-      'freelance', 'coding', 'belajar', 'latihan', 'progres', 'hari ke-',
-      'untung', 'rugi', 'modal', 'omzet', 'usaha', 'bisnis', 'side hustle',
-      'ui/ux', 'figma', 'blender', 'photoshop', 'canva', 'skill'
-    ];
-
-    const SPILL_KEYWORDS = [
-      'capek', 'lelah', 'sendiri', 'hujan', 'nangis', 'sedih', 'putus asa',
-      'gabisa', 'gatau', 'kenapa ya', 'berat', 'beban', 'ngeluh', 'curhat',
-      'mental health', 'anxiety', 'depresi', 'overthinking', 'burnout',
-      'gaada yang ngerti', 'rasa', 'kosong', 'hampa', 'tertekan',
-      'pengen ilang', 'pengen ngilang', 'susah', 'buntu', 'mentok'
-    ];
-
-    // === DETEKSI ZONA DARI ISI RANT ===
     function detectZone(content) {
       const lower = content.toLowerCase();
-      if (HYPE_KEYWORDS.some(kw => lower.includes(kw))) return 'hype';
-      if (NGUSAHAIN_KEYWORDS.some(kw => lower.includes(kw))) return 'ngusahain';
-      if (SPILL_KEYWORDS.some(kw => lower.includes(kw))) return 'spill';
-      return 'spill'; // default
+      if (hypeKeywords.some(k => lower.includes(k))) return 'hype';
+      if (ngusahainKeywords.some(k => lower.includes(k))) return 'ngusahain';
+      if (spillKeywords.some(k => lower.includes(k))) return 'spill';
+      return 'other';
     }
 
-    // === STATE ===
-    const currentUser = localStorage.getItem('nope_username');
-    if (!currentUser) {
-      window.location.href = 'index.html';
-    }
-    document.getElementById('username-display').textContent = currentUser;
-
-    // === LOAD & SORTIR RANT ===
-    async function loadFeed() {
-      try {
-        const rantsData = await supabaseFetch('rants', 'GET', null);
-        const allRants = rantsData || [];
-
-        const hype = [], ngusahain = [], spill = [];
-        allRants.forEach(r => {
-          const zone = detectZone(r.content);
-          if (zone === 'hype' && hype.length < 5) hype.push(r);
-          else if (zone === 'ngusahain' && ngusahain.length < 5) ngusahain.push(r);
-          else if (spill.length < 5) spill.push(r);
-        });
-
-        renderZone('hype', hype);
-        renderZone('ngusahain', ngusahain);
-        renderZone('spill', spill);
-
-      } catch (e) {
-        console.error('Gagal muat feed:', e);
-        renderZone('hype', []);
-        renderZone('ngusahain', []);
-        renderZone('spill', []);
+    // Data dummy
+    const hangoutData = [
+      {
+        title: "Warung Nasi Ibu Siti",
+        content: "Nasi campur lengkap cuma 18k. Buka jam 6 pagi. Lokasi: dekat Stasiun Tugu.",
+        city: "yogyakarta",
+        price: "<50k",
+        timestamp: "2 hari lalu",
+        has_promo: true,
+        promo_ends_at: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0]
       }
-    }
+    ];
 
-    function renderZone(zoneKey, posts) {
-      const container = document.getElementById(`zone-${zoneKey}`).querySelector('.zone-content');
-      const divider = container.querySelector('.zone-divider');
-      if (!divider) return;
+    const otherData = [
+      { title: "Jin BTS Bikin Gue Nangis", content: "Baru nonton wawancara Jin...", timestamp: "2 jam lalu" },
+      { title: "Hari ke-15 Belajar Coding", content: "Akhirnya ngerti localStorage...", timestamp: "5 jam lalu" },
+      { title: "Gue Nggak Sayang Sama Orang Tua", content: "Gue tau ini dosa...", timestamp: "12 jam lalu" }
+    ];
 
-      while (divider.nextSibling) divider.parentNode.removeChild(divider.nextSibling);
+    // Tentukan zona untuk non-Hangouts
+    otherData.forEach(d => d.zone = detectZone(d.content));
 
-      if (posts.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'empty-zone';
-        empty.textContent = 'Belum ada jejak di zona ini.';
-        container.appendChild(empty);
-        return;
-      }
+    function renderContent(zona, cityFilter = 'all') {
+      const container = document.getElementById('zone-content');
+      let html = '';
 
-      const emojis = { hype: '🔥', ngusahain: '+1', spill: '🫂' };
-      posts.forEach(post => {
-        const el = document.createElement('div');
-        el.className = 'zone-post-container';
-        el.innerHTML = `
-          <div class="post-header">
-            <span class="post-username">@${post.username}</span>
-            <span class="post-emoji">${emojis[zoneKey]}</span>
+      if (zona === 'hangout') {
+        const filtered = cityFilter === 'all' ? hangoutData : hangoutData.filter(h => h.city === cityFilter);
+        html = filtered.map(h => {
+          const now = new Date();
+          const end = new Date(h.promo_ends_at);
+          const showPromo = h.has_promo && now < end;
+          return `
+            <div class="card">
+              <div class="card-meta">
+                <span class="zone-badge hangout">Hidden Gem</span>
+                ${showPromo ? '<span class="promo-badge">🎁 Diskon 30 hari</span>' : ''}
+                <span class="price-tag">${h.price === '<50k' ? 'Di bawah 50k' : h.price}</span>
+                <span>${h.timestamp}</span>
+              </div>
+              <div class="card-title">${h.title}</div>
+              <p>${h.content}</p>
+              <div style="background:#f0f0f0;padding:12px;border-radius:10px;margin:14px 0;font-size:14px;">
+                <strong>✨ Dapatkan diskon!</strong><br>
+                Tunjukkan profil NOPE-mu di kasir:<br>
+                • Cukup login → diskon 10%<br>
+                • Login + punya rant → diskon 20%
+              </div>
+              <div class="response-bar">
+                <button class="emoji-btn">😊</button>
+                <button class="emoji-btn">😢</button>
+                <button class="emoji-btn">🤗</button>
+                <button class="emoji-btn">🔥</button>
+                <button class="comment-btn">💬</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        const dataToShow = zona === 'all' ? otherData : otherData.filter(d => d.zone === zona);
+        html = dataToShow.map(d => `
+          <div class="card">
+            <div class="card-meta">
+              <span class="zone-badge ${
+                d.zone === 'hype' ? 'hype' : 
+                d.zone === 'ngusahain' ? 'ngusahain' : 'spill'
+              }">${
+                d.zone === 'hype' ? 'Hype Haus' : 
+                d.zone === 'ngusahain' ? 'Ngusahain' : 'Spill Zone'
+              }</span>
+              <span>${d.timestamp}</span>
+            </div>
+            <div class="card-title">${d.title}</div>
+            <p>${d.content}</p>
+            <div class="response-bar">
+              <button class="emoji-btn">😊</button>
+              <button class="emoji-btn">😢</button>
+              <button class="emoji-btn">🤗</button>
+              <button class="emoji-btn">🔥</button>
+              <button class="comment-btn">💬</button>
+            </div>
           </div>
-          <div class="post-content">${post.content}</div>
-        `;
-        container.appendChild(el);
-      });
-    }
-
-    // === NAVIGASI ===
-    function navigateTo(page) {
-      window.location.href = page;
-    }
-
-    function logout() {
-      if (confirm('Keluar dari akun?')) {
-        localStorage.removeItem('nope_username');
-        window.location.href = 'index.html';
+        `).join('');
       }
+
+      container.innerHTML = html || '<div style="text-align:center;color:var(--muted);padding:40px 0;">Belum ada konten</div>';
     }
 
-    // === RITUAL: PULSE ===
-    function triggerPulse() {
-      const pulse = document.createElement('div');
-      pulse.className = 'pulse-animation';
-      document.body.appendChild(pulse);
-      setTimeout(() => pulse.remove(), 1200);
-    }
+    // Init
+    let currentZone = 'all';
+    renderContent(currentZone);
 
-    // === INIT ===
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('nav-jejak').onclick = () => navigateTo('jejak.html');
-      document.getElementById('nav-frekuensi').onclick = () => navigateTo('frekuensi.html');
-      document.getElementById('nav-saynope').onclick = () => navigateTo('saynope.html');
-      document.getElementById('nav-glitch').onclick = () => navigateTo('glitch.html');
-      document.getElementById('settings-btn').onclick = logout;
+    // Tab switching
+    document.querySelectorAll('.zone-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.zone-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentZone = tab.dataset.zone;
+        
+        if (currentZone === 'hangout') {
+          document.getElementById('hangoutFilters').classList.add('active');
+          renderContent('hangout');
+        } else {
+          document.getElementById('hangoutFilters').classList.remove('active');
+          renderContent(currentZone);
+        }
+      });
+    });
 
-      loadFeed().then(triggerPulse);
+    // Filter kota
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderContent('hangout', btn.dataset.city);
+      });
     });
   </script>
 </body>
