@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -20,7 +20,7 @@
       --paid: #4caf50;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg);
       color: var(--text);
@@ -37,38 +37,63 @@
       max-width: 100%;
     }
 
+    /* === HEADER YANG DISALIN DARI FREKUENSI === */
     header {
+      position: sticky;
+      top: 0;
+      background: #000000cc;
+      backdrop-filter: blur(6px);
+      padding: 12px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 0 16px;
+      z-index: 10;
     }
 
     .logo {
-      font-weight: 500;
-      font-size: 20px;
-      letter-spacing: -0.5px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ff9999;
+      margin-left: 16px;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+    }
+
+    .nav-mini {
+      display: flex;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-right: 8px;
+    }
+
+    .nav-mini span {
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 2px;
+    }
+
+    .nav-mini span:hover {
+      color: var(--text);
     }
 
     .settings-btn {
-      background: transparent;
+      background: none;
       border: none;
       color: var(--muted);
-      font-size: 18px;
+      font-size: 20px;
       cursor: pointer;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      transform: rotate(90deg);
     }
 
-    .settings-btn:hover {
-      color: var(--text);
-      background: var(--border);
-    }
-
+    /* === SISA STYLE DARI GLITCH ASLI === */
     .greeting {
       font-size: 18px;
       font-weight: 400;
@@ -179,7 +204,6 @@
       opacity: 1;
     }
 
-    /* Modal Komentar */
     .comment-modal {
       position: fixed;
       top: 0;
@@ -306,9 +330,18 @@
 </head>
 <body>
   <div class="wrapper">
+    <!-- HEADER DISALIN DARI FREKUENSI -->
     <header>
       <div class="logo">NOPE</div>
-      <button class="settings-btn" onclick="window.location.href='glitch.html'">⋯</button>
+      <div class="top-right">
+        <div class="nav-mini">
+          <span id="nav-jejak">Jejak</span>
+          <span id="nav-frekuensi">Frekuensi</span>
+          <span id="nav-saynope">SayNOPE</span>
+          <span id="nav-glitch">GLITCH</span>
+        </div>
+        <button class="settings-btn" id="settings-btn">⋯</button>
+      </div>
     </header>
 
     <div class="greeting">Hello @<span id="username-display"></span></div>
@@ -335,9 +368,10 @@
   </div>
 
   <script>
+    // === CONFIG ===
     const isSubscribed = localStorage.getItem('nope_subscribed') === 'true';
 
-    // Data dummy: hanya type yang cocok untuk GLITCH
+    // Data dummy GLITCH
     const articles = [
       {
         id: 'film',
@@ -383,7 +417,6 @@
           <p>Dan Tan Malaka bukan penulis — ia <strong>pelatih berpikir</strong>.</p>
           <div class="signature">— @HD, 1% petani 99% failure...</div>`
       },
-      // ✨ GANTI HANGOUT DENGAN WAWANCARA
       {
         id: 'interview',
         title: 'Wawancara: @HD — "Aku Memilih Jadi Gagal"',
@@ -432,7 +465,6 @@
       });
 
       card.querySelectorAll('.emoji-btn').forEach(btn => btn.addEventListener('click', e => e.stopPropagation()));
-
       card.querySelector('.comment-btn').addEventListener('click', (e) => {
         e.stopPropagation();
         openCommentModal(article.title);
@@ -441,12 +473,9 @@
       container.appendChild(card);
     });
 
-    // Modal komentar (sama seperti sebelumnya)
-    const modal = document.getElementById('commentModal');
-    const closeModal = document.getElementById('closeModal');
-    const commentContent = document.getElementById('commentContent');
-
     function openCommentModal(title) {
+      const modal = document.getElementById('commentModal');
+      const commentContent = document.getElementById('commentContent');
       if (isSubscribed) {
         commentContent.innerHTML = `
           <div><strong>${title}</strong></div>
@@ -473,10 +502,34 @@
       modal.classList.add('active');
     }
 
-    closeModal.addEventListener('click', () => modal.classList.remove('active'));
-    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('commentModal').classList.remove('active');
+    });
+    document.getElementById('commentModal').addEventListener('click', (e) => {
+      if (e.target.id === 'commentModal') e.target.classList.remove('active');
+    });
 
     document.getElementById('username-display').textContent = localStorage.getItem('nope_username') || 'kawan';
+
+    // === NAVIGASI (SAMA SEPERTI DI FREKUENSI) ===
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      if (confirm('Keluar dari akun?')) {
+        localStorage.removeItem('nope_username');
+        window.location.href = 'login.html';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('nav-jejak').onclick = () => navigateTo('jejak.html');
+      document.getElementById('nav-frekuensi').onclick = () => navigateTo('index.html');
+      document.getElementById('nav-saynope').onclick = () => navigateTo('saynope.html');
+      document.getElementById('nav-glitch').onclick = () => navigateTo('glitch.html');
+      document.getElementById('settings-btn').onclick = logout;
+    });
   </script>
 </body>
 </html>
