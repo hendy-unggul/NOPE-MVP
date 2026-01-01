@@ -15,6 +15,7 @@
       --muted: #555;
       --accent: #4903fc;
       --logo-color: #ff9999;
+      --hangouts-color: #3498db;
     }
     [data-theme="hackers"] {
       --bg: #000;
@@ -89,11 +90,51 @@
       cursor: pointer;
       transform: rotate(90deg);
     }
-    .greeting {
-      font-size: 16px;
-      margin: 20px 0 24px 0;
-      color: var(--text);
+
+    /* === FREKUENSI BUTTONS === */
+    .mode-selector {
+      display: flex;
+      gap: 12px;
+      margin: 24px 0 32px;
     }
+    .mode-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .mode-btn.active {
+      border-color: var(--accent);
+      background: rgba(73, 3, 252, 0.15);
+    }
+    .mode-btn.hangouts {
+      border-color: var(--hangouts-color);
+    }
+    .mode-btn.hangouts.active {
+      border-color: var(--hangouts-color);
+      background: rgba(52, 152, 219, 0.15);
+    }
+
+    /* === CONTENT SECTIONS === */
+    .content-section {
+      display: none;
+    }
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .zones {
       margin-bottom: 32px;
     }
@@ -114,11 +155,6 @@
       margin-bottom: 0;
       padding-bottom: 0;
     }
-    .zone-post {
-      font-size: 13px;
-      color: var(--text);
-      line-height: 1.4;
-    }
     .post-header {
       display: flex;
       align-items: center;
@@ -134,10 +170,6 @@
       color: var(--muted);
       font-size: 14px;
       opacity: 0.7;
-    }
-    .post-content {
-      color: var(--text);
-      font-size: 13px;
     }
     .zone-icon {
       font-size: 18px;
@@ -158,20 +190,6 @@
       background: var(--border);
       margin: 0 0 12px 0;
     }
-    .tagline {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 0 16px 20px;
-      line-height: 1.5;
-      max-width: 320px;
-      margin: 0 auto;
-    }
-    .tagline strong {
-      color: var(--accent);
-      display: block;
-      margin-top: 4px;
-    }
     .empty-zone {
       color: var(--muted);
       font-size: 13px;
@@ -190,7 +208,7 @@
       transition: all 0.2s;
     }
     .hangout-item:hover {
-      border-color: var(--accent);
+      border-color: var(--hangouts-color);
       transform: translateX(4px);
     }
     .hangout-header {
@@ -211,7 +229,7 @@
     .hangout-badge {
       font-size: 10px;
       padding: 2px 6px;
-      background: var(--accent);
+      background: var(--hangouts-color);
       color: var(--text);
       border-radius: 4px;
       margin-left: auto;
@@ -231,8 +249,23 @@
       transition: all 0.2s;
     }
     .add-hangout-btn:hover {
-      border-color: var(--accent);
+      border-color: var(--hangouts-color);
+      color: var(--hangouts-color);
+    }
+
+    .tagline {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 0 16px 20px;
+      line-height: 1.5;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .tagline strong {
       color: var(--accent);
+      display: block;
+      margin-top: 4px;
     }
 
     /* === MODAL === */
@@ -318,7 +351,6 @@
       opacity: 0.8;
     }
 
-    /* === RITUAL: PULSE === */
     .pulse-animation {
       position: fixed;
       top: 0;
@@ -352,59 +384,62 @@
       </div>
     </header>
 
-    <div class="greeting">Hello @<span id="username-display"></span></div>
+    <!-- DUA TOMBOL UTAMA -->
+    <div class="mode-selector">
+      <div class="mode-btn active" id="btn-frekuensi">Frekuensimu</div>
+      <div class="mode-btn hangouts" id="btn-hangouts">Hangouts</div>
+    </div>
 
-    <!-- Hype Haus -->
-    <div class="zones">
-      <div class="zone-item" id="zone-hype">
-        <div class="zone-icon">🎧</div>
-        <div class="zone-content">
-          <h3 class="zone-title">Hype Haus</h3>
-          <p class="zone-description">"Tempat nge-hype idol, drakor, atau AU tanpa takut di-spill."</p>
-          <div class="zone-divider"></div>
+    <!-- FREKUENSI CONTENT -->
+    <div class="content-section active" id="section-frekuensi">
+      <div class="zones">
+        <div class="zone-item" id="zone-hype">
+          <div class="zone-icon">🎧</div>
+          <div class="zone-content">
+            <h3 class="zone-title">Hype Haus</h3>
+            <p class="zone-description">"Tempat nge-hype idol, drakor, atau AU tanpa takut di-spill."</p>
+            <div class="zone-divider"></div>
+          </div>
+        </div>
+
+        <div class="zone-item" id="zone-ngusahain">
+          <div class="zone-icon">💼</div>
+          <div class="zone-content">
+            <h3 class="zone-title">Ngusahain</h3>
+            <p class="zone-description">"Cerita progress lo: dari skripsi sampe jualan thrifting."</p>
+            <div class="zone-divider"></div>
+          </div>
+        </div>
+
+        <div class="zone-item" id="zone-spill">
+          <div class="zone-icon">💬</div>
+          <div class="zone-content">
+            <h3 class="zone-title">Spill Zone</h3>
+            <p class="zone-description">"Curhat, ngeluh, atau cuma pengin ngomong — no cap, no jaim."</p>
+            <div class="zone-divider"></div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Ngusahain -->
-      <div class="zone-item" id="zone-ngusahain">
-        <div class="zone-icon">💼</div>
-        <div class="zone-content">
-          <h3 class="zone-title">Ngusahain</h3>
-          <p class="zone-description">"Cerita progress lo: dari skripsi sampe jualan thrifting."</p>
-          <div class="zone-divider"></div>
-        </div>
-      </div>
-
-      <!-- Spill Zone -->
-      <div class="zone-item" id="zone-spill">
-        <div class="zone-icon">💬</div>
-        <div class="zone-content">
-          <h3 class="zone-title">Spill Zone</h3>
-          <p class="zone-description">"Curhat, ngeluh, atau cuma pengin ngomong — no cap, no jaim."</p>
-          <div class="zone-divider"></div>
-        </div>
-      </div>
-
-      <!-- HANGOUTS SECTION -->
-      <div class="zone-item" id="zone-hangouts">
+    <!-- HANGOUTS CONTENT -->
+    <div class="content-section" id="section-hangouts">
+      <div class="zone-item">
         <div class="zone-icon">📍</div>
         <div class="zone-content">
           <h3 class="zone-title">Hangouts</h3>
           <p class="zone-description">"Tempat nongkrong favorit komunitas — dari hidden gems sampe WFH spot."</p>
           <div class="zone-divider"></div>
           
-          <!-- Hidden Gems (Admin Curated) -->
           <h4 style="font-size: 14px; margin-bottom: 8px; color: var(--text);">💎 Hidden Gems</h4>
           <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">Dikurasi oleh admin</p>
           <div id="hangouts-gems"></div>
 
-          <!-- WFH Cafe -->
           <h4 style="font-size: 14px; margin: 20px 0 8px 0; color: var(--text);">☕ WFH Cafe</h4>
           <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">Cafe nyaman buat kerja remote</p>
           <div id="hangouts-wfh"></div>
           <button class="add-hangout-btn" onclick="openAddHangout('wfh')">+ Tambah WFH Cafe</button>
 
-          <!-- Enak Under 10ribu -->
           <h4 style="font-size: 14px; margin: 20px 0 8px 0; color: var(--text);">🍜 Enak Under 10ribu</h4>
           <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">Kuliner enak yang ramah kantong</p>
           <div id="hangouts-food"></div>
@@ -475,7 +510,6 @@
       return await res.json();
     }
 
-    // === KATA KUNCI ZONA ===
     const HYPE_KEYWORDS = [
       'v!', 'v!!!!', 'v', 'kpop', 'skz', 'txt', 'bts', 'seventeen', 'enhypen',
       'drakor', 'k-drama', 'squid game', 'crash landing', 'kim seon ho',
@@ -509,14 +543,29 @@
       return 'spill';
     }
 
-    // === STATE ===
     const currentUser = localStorage.getItem('nope_username');
     if (!currentUser) {
-      window.location.href = 'index.html';
+      window.location.href = 'login.html';
     }
-    document.getElementById('username-display').textContent = currentUser;
 
-    // === LOAD FEED ===
+    // === TOGGLE MODE ===
+    function switchMode(mode) {
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+
+      if (mode === 'frekuensi') {
+        document.getElementById('btn-frekuensi').classList.add('active');
+        document.getElementById('section-frekuensi').classList.add('active');
+      } else {
+        document.getElementById('btn-hangouts').classList.add('active');
+        document.getElementById('section-hangouts').classList.add('active');
+      }
+    }
+
+    document.getElementById('btn-frekuensi').addEventListener('click', () => switchMode('frekuensi'));
+    document.getElementById('btn-hangouts').addEventListener('click', () => switchMode('hangouts'));
+
+    // === LOAD FEED (Hanya untuk Frekuensi) ===
     async function loadFeed() {
       try {
         const rantsData = await supabaseFetch('rants', 'GET', null);
@@ -533,20 +582,15 @@
         renderZone('hype', hype);
         renderZone('ngusahain', ngusahain);
         renderZone('spill', spill);
-
       } catch (e) {
         console.error('Gagal muat feed:', e);
-        renderZone('hype', []);
-        renderZone('ngusahain', []);
-        renderZone('spill', []);
+        ['hype', 'ngusahain', 'spill'].forEach(z => renderZone(z, []));
       }
     }
 
     function renderZone(zoneKey, posts) {
       const container = document.getElementById(`zone-${zoneKey}`).querySelector('.zone-content');
       const divider = container.querySelector('.zone-divider');
-      if (!divider) return;
-
       while (divider.nextSibling) divider.parentNode.removeChild(divider.nextSibling);
 
       if (posts.length === 0) {
@@ -576,7 +620,6 @@
     async function loadHangouts() {
       try {
         const data = await supabaseFetch('hangouts', 'GET', null, '?order=created_at.desc');
-        
         const gems = data.filter(h => h.category === 'gems');
         const wfh = data.filter(h => h.category === 'wfh');
         const food = data.filter(h => h.category === 'food');
@@ -586,21 +629,17 @@
         renderHangouts('food', food);
       } catch (e) {
         console.error('Gagal muat hangouts:', e);
-        renderHangouts('gems', []);
-        renderHangouts('wfh', []);
-        renderHangouts('food', []);
+        ['gems', 'wfh', 'food'].forEach(c => renderHangouts(c, []));
       }
     }
 
     function renderHangouts(category, items) {
       const container = document.getElementById(`hangouts-${category}`);
       container.innerHTML = '';
-
       if (items.length === 0) {
         container.innerHTML = '<div class="empty-zone">Belum ada rekomendasi.</div>';
         return;
       }
-
       items.forEach(item => {
         const el = document.createElement('div');
         el.className = 'hangout-item';
@@ -629,7 +668,6 @@
 
     document.getElementById('form-hangout').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
       const name = document.getElementById('input-name').value;
       const location = document.getElementById('input-location').value;
       const category = document.getElementById('input-category').value;
@@ -644,7 +682,6 @@
           username: currentUser,
           is_admin_curated: false
         });
-
         closeModal();
         loadHangouts();
         triggerPulse();
@@ -661,7 +698,7 @@
     function logout() {
       if (confirm('Keluar dari akun?')) {
         localStorage.removeItem('nope_username');
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
       }
     }
 
@@ -675,16 +712,15 @@
     // === INIT ===
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('nav-jejak').onclick = () => navigateTo('jejak.html');
-      document.getElementById('nav-frekuensi').onclick = () => navigateTo('frekuensi.html');
+      document.getElementById('nav-frekuensi').onclick = () => navigateTo('index.html');
       document.getElementById('nav-saynope').onclick = () => navigateTo('saynope.html');
       document.getElementById('nav-glitch').onclick = () => navigateTo('glitch.html');
       document.getElementById('settings-btn').onclick = logout;
 
-      loadFeed();
-      loadHangouts().then(triggerPulse);
+      loadFeed(); // Hanya muat rant saat mode Frekuensi aktif
+      loadHangouts(); // Muat hangouts sekaligus
     });
 
-    // Close modal when clicking outside
     document.getElementById('modal-add').addEventListener('click', (e) => {
       if (e.target.id === 'modal-add') closeModal();
     });
