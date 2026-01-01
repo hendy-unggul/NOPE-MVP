@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NOPE — Login</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --bg: #fcfcfc;
+      --surface: #ffffff;
+      --text: #121212;
+      --muted: #666666;
+      --border: #e0e0e0;
+      --accent: #4903fc;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0c0c0c;
+      --surface: #141414;
+      --text: #f0f0f0;
+      --muted: #a0a0a0;
+      --border: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0 16px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 28px;
+      margin-bottom: 8px;
+      letter-spacing: -0.8px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+
+    /* === Instruksi di atas form === */
+    .instruction {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      text-align: left;
+      padding-left: 4px;
+    }
+
+    /* === Input field === */
+    .username-input {
+      width: 100%;
+      height: 52px;
+      padding: 0 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      font-size: 16px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .username-input:focus {
+      border-color: var(--accent);
+    }
+
+    .username-input::placeholder {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* === CTA "Gaskeun" === */
+    .login-btn {
+      width: 100%;
+      height: 56px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 24px 0 16px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .login-btn:hover, .login-btn:focus {
+      opacity: 0.95;
+    }
+
+    /* === Teks bawah === */
+    .footer-note {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Dark mode adjustments */
+    [data-theme="dark"] .username-input {
+      background: #1a1a1a;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">NOPE</div>
+    <div class="subtitle">Tempat curhat yang ngerti</div>
+
+    <!-- Instruksi di atas form -->
+    <div class="instruction">dua kata unik tanpa spasi</div>
+
+    <!-- Form input -->
+    <input
+      type="text"
+      id="username"
+      class="username-input"
+      placeholder="matahari timur"
+      maxlength="30"
+      autocomplete="off"
+    />
+
+    <!-- CTA -->
+    <button class="login-btn" onclick="handleLogin()">Gaskeun</button>
+
+    <!-- Teks bawah -->
+    <div class="footer-note">
+      Tanpa email, password, dan konfirmasi
+    </div>
+  </div>
+
+  <script>
+    function handleLogin() {
+      const username = document.getElementById('username').value.trim();
+      
+      if (!username) {
+        alert('Masukkan dua kata unik, misal: "bulan jatuh"');
+        return;
+      }
+
+      // Ganti spasi dengan spasi (boleh, sesuai permintaanmu)
+      // Tapi pastikan tidak ada underscore/dot
+      if (username.includes('_') || username.includes('.')) {
+        alert('Gunakan spasi, bukan underscore atau titik.');
+        return;
+      }
+
+      // Pastikan ada dua kata
+      const words = username.split(' ').filter(w => w.length > 0);
+      if (words.length < 2) {
+        alert('Butuh dua kata, misal: "awan liar"');
+        return;
+      }
+
+      // Simpan ke localStorage
+      localStorage.setItem('nope_username', username);
+      localStorage.setItem('nope_onboarded', 'true');
+      
+      // Arahkan ke halaman utama
+      window.location.href = 'frekuensi.html';
+    }
+
+    // Enter key support
+    document.getElementById('username').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  </script>
+</body>
+</html>
