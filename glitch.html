@@ -33,11 +33,12 @@
     }
 
     .wrapper {
+      max-width: 480px;
+      margin: 0 auto;
       padding: 0 16px;
-      max-width: 100%;
     }
 
-    /* === HEADER YANG DISALIN DARI FREKUENSI === */
+    /* === HEADER FIXED === */
     header {
       position: sticky;
       top: 0;
@@ -56,13 +57,13 @@
       font-weight: 700;
       letter-spacing: -0.02em;
       color: #ff9999;
-      margin-left: 16px;
+      margin-left: 0;
     }
 
     .top-right {
       display: flex;
       align-items: center;
-      margin-right: 12px;
+      margin-right: 0;
     }
 
     .nav-mini {
@@ -330,7 +331,7 @@
 </head>
 <body>
   <div class="wrapper">
-    <!-- HEADER DISALIN DARI FREKUENSI -->
+    <!-- HEADER FIXED -->
     <header>
       <div class="logo">NOPE</div>
       <div class="top-right">
@@ -511,7 +512,7 @@
 
     document.getElementById('username-display').textContent = localStorage.getItem('nope_username') || 'kawan';
 
-    // === NAVIGASI (SAMA SEPERTI DI FREKUENSI) ===
+    // === NAVIGASI ===
     function navigateTo(page) {
       window.location.href = page;
     }
