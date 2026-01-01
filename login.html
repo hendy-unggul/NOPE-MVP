@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NOPE — Login</title>
-  <link rel="stylesheet" href="style.css">
   <style>
     :root {
       --bg: #fcfcfc;
@@ -13,14 +12,6 @@
       --muted: #666666;
       --border: #e0e0e0;
       --accent: #4903fc;
-    }
-
-    [data-theme="dark"] {
-      --bg: #0c0c0c;
-      --surface: #141414;
-      --text: #f0f0f0;
-      --muted: #a0a0a0;
-      --border: #333333;
     }
 
     * {
@@ -51,7 +42,6 @@
       font-size: 28px;
       margin-bottom: 8px;
       letter-spacing: -0.8px;
-      color: var(--text);
     }
 
     .subtitle {
@@ -61,7 +51,6 @@
       line-height: 1.5;
     }
 
-    /* === Instruksi di atas form === */
     .instruction {
       font-size: 15px;
       color: var(--muted);
@@ -70,7 +59,6 @@
       padding-left: 4px;
     }
 
-    /* === Input field === */
     .username-input {
       width: 100%;
       height: 52px;
@@ -81,7 +69,6 @@
       background: var(--surface);
       color: var(--text);
       outline: none;
-      transition: border-color 0.2s;
     }
 
     .username-input:focus {
@@ -90,10 +77,8 @@
 
     .username-input::placeholder {
       color: var(--muted);
-      font-weight: 400;
     }
 
-    /* === CTA "Gaskeun" === */
     .login-btn {
       width: 100%;
       height: 56px;
@@ -105,23 +90,17 @@
       font-weight: 600;
       margin: 24px 0 16px;
       cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
-    .login-btn:hover, .login-btn:focus {
       opacity: 0.95;
     }
 
-    /* === Teks bawah === */
+    .login-btn:hover {
+      opacity: 1;
+    }
+
     .footer-note {
       font-size: 14px;
       color: var(--muted);
       line-height: 1.5;
-    }
-
-    /* Dark mode adjustments */
-    [data-theme="dark"] .username-input {
-      background: #1a1a1a;
     }
   </style>
 </head>
@@ -130,10 +109,7 @@
     <div class="logo">NOPE</div>
     <div class="subtitle">Tempat curhat yang ngerti</div>
 
-    <!-- Instruksi di atas form -->
     <div class="instruction">dua kata unik tanpa spasi</div>
-
-    <!-- Form input -->
     <input
       type="text"
       id="username"
@@ -142,11 +118,7 @@
       maxlength="30"
       autocomplete="off"
     />
-
-    <!-- CTA -->
     <button class="login-btn" onclick="handleLogin()">Gaskeun</button>
-
-    <!-- Teks bawah -->
     <div class="footer-note">
       Tanpa email, password, dan konfirmasi
     </div>
@@ -155,35 +127,24 @@
   <script>
     function handleLogin() {
       const username = document.getElementById('username').value.trim();
-      
       if (!username) {
         alert('Masukkan dua kata unik, misal: "bulan jatuh"');
         return;
       }
-
-      // Ganti spasi dengan spasi (boleh, sesuai permintaanmu)
-      // Tapi pastikan tidak ada underscore/dot
       if (username.includes('_') || username.includes('.')) {
         alert('Gunakan spasi, bukan underscore atau titik.');
         return;
       }
-
-      // Pastikan ada dua kata
       const words = username.split(' ').filter(w => w.length > 0);
       if (words.length < 2) {
         alert('Butuh dua kata, misal: "awan liar"');
         return;
       }
-
-      // Simpan ke localStorage
       localStorage.setItem('nope_username', username);
       localStorage.setItem('nope_onboarded', 'true');
-      
-      // Arahkan ke halaman utama
-      window.location.href = 'frekuensi.html';
+      window.location.href = 'index.html';
     }
 
-    // Enter key support
     document.getElementById('username').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') handleLogin();
     });
