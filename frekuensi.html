@@ -179,6 +179,145 @@
       padding: 12px 0;
     }
 
+    /* === HANGOUTS STYLING === */
+    .hangout-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .hangout-item:hover {
+      border-color: var(--accent);
+      transform: translateX(4px);
+    }
+    .hangout-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .hangout-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .hangout-location {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .hangout-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      background: var(--accent);
+      color: var(--text);
+      border-radius: 4px;
+      margin-left: auto;
+    }
+    .admin-badge {
+      background: #ff6b6b;
+    }
+    .add-hangout-btn {
+      width: 100%;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .add-hangout-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* === MODAL === */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 400px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--text);
+    }
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn:hover {
+      opacity: 0.8;
+    }
+
     /* === RITUAL: PULSE === */
     .pulse-animation {
       position: fixed;
@@ -221,9 +360,8 @@
         <div class="zone-icon">🎧</div>
         <div class="zone-content">
           <h3 class="zone-title">Hype Haus</h3>
-          <p class="zone-description">“Tempat nge-hype idol, drakor, atau AU tanpa takut di-spill.”</p>
+          <p class="zone-description">"Tempat nge-hype idol, drakor, atau AU tanpa takut di-spill."</p>
           <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
         </div>
       </div>
 
@@ -232,9 +370,8 @@
         <div class="zone-icon">💼</div>
         <div class="zone-content">
           <h3 class="zone-title">Ngusahain</h3>
-          <p class="zone-description">“Cerita progress lo: dari skripsi sampe jualan thrifting.”</p>
+          <p class="zone-description">"Cerita progress lo: dari skripsi sampe jualan thrifting."</p>
           <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
         </div>
       </div>
 
@@ -243,9 +380,35 @@
         <div class="zone-icon">💬</div>
         <div class="zone-content">
           <h3 class="zone-title">Spill Zone</h3>
-          <p class="zone-description">“Curhat, ngeluh, atau cuma pengin ngomong — no cap, no jaim.”</p>
+          <p class="zone-description">"Curhat, ngeluh, atau cuma pengin ngomong — no cap, no jaim."</p>
           <div class="zone-divider"></div>
-          <!-- Posts will be injected here -->
+        </div>
+      </div>
+
+      <!-- HANGOUTS SECTION -->
+      <div class="zone-item" id="zone-hangouts">
+        <div class="zone-icon">📍</div>
+        <div class="zone-content">
+          <h3 class="zone-title">Hangouts</h3>
+          <p class="zone-description">"Tempat nongkrong favorit komunitas — dari hidden gems sampe WFH spot."</p>
+          <div class="zone-divider"></div>
+          
+          <!-- Hidden Gems (Admin Curated) -->
+          <h4 style="font-size: 14px; margin-bottom: 8px; color: var(--text);">💎 Hidden Gems</h4>
+          <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">Dikurasi oleh admin</p>
+          <div id="hangouts-gems"></div>
+
+          <!-- WFH Cafe -->
+          <h4 style="font-size: 14px; margin: 20px 0 8px 0; color: var(--text);">☕ WFH Cafe</h4>
+          <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">Cafe nyaman buat kerja remote</p>
+          <div id="hangouts-wfh"></div>
+          <button class="add-hangout-btn" onclick="openAddHangout('wfh')">+ Tambah WFH Cafe</button>
+
+          <!-- Enak Under 10ribu -->
+          <h4 style="font-size: 14px; margin: 20px 0 8px 0; color: var(--text);">🍜 Enak Under 10ribu</h4>
+          <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">Kuliner enak yang ramah kantong</p>
+          <div id="hangouts-food"></div>
+          <button class="add-hangout-btn" onclick="openAddHangout('food')">+ Tambah Tempat Makan</button>
         </div>
       </div>
     </div>
@@ -257,13 +420,44 @@
     </div>
   </div>
 
-  <script>
-    // === CONFIG — GANTI INI DENGAN PROYEK & KEY-MU ===
-    const SUPABASE_URL = 'https://fuovfrdicdhnlymnacpz.supabase.co'; // 🔁 GANTI DENGAN PROJECT ID-MU
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b3ZmcmRpY2Robmx5bW5hY3B6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjYxMzEsImV4cCI6MjA4MjYwMjEzMX0.oX4fVTEIWiRG2NaNJJKOV8dTnSHWhicLVMIFzZUl1o0';                 // 🔁 GANTI DENGAN ANON KEY-MU
+  <!-- Modal Add Hangout -->
+  <div id="modal-add" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">Tambah Hangout</div>
+      <form id="form-hangout">
+        <div class="form-group">
+          <label class="form-label">Nama Tempat</label>
+          <input type="text" class="form-input" id="input-name" required placeholder="Contoh: Kopi Janji Jiwa">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lokasi</label>
+          <input type="text" class="form-input" id="input-location" required placeholder="Contoh: Kemang, Jakarta Selatan">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select class="form-select" id="input-category" required>
+            <option value="wfh">WFH Cafe</option>
+            <option value="food">Enak Under 10ribu</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan (opsional)</label>
+          <textarea class="form-textarea" id="input-notes" placeholder="Wifi kenceng, colokan banyak, harga terjangkau..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    // === OLD FASHION WAY — MANUAL FETCH ===
-    async function supabaseFetch(table, method = 'GET', body = null) {
+  <script>
+    // === CONFIG ===
+    const SUPABASE_URL = 'https://fuovfrdicdhnlymnacpz.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b3ZmcmRpY2Robmx5bW5hY3B6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjYxMzEsImV4cCI6MjA4MjYwMjEzMX0.oX4fVTEIWiRG2NaNJJKOV8dTnSHWhicLVMIFzZUl1o0';
+
+    async function supabaseFetch(table, method = 'GET', body = null, filter = '') {
       const headers = {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -271,7 +465,7 @@
         'Prefer': 'return=representation'
       };
 
-      let url = `${SUPABASE_URL}/rest/v1/${table}`;
+      let url = `${SUPABASE_URL}/rest/v1/${table}${filter}`;
       let options = { method, headers };
 
       if (body) options.body = JSON.stringify(body);
@@ -281,7 +475,7 @@
       return await res.json();
     }
 
-    // === KATA KUNCI ZONA (20-30 per zona) ===
+    // === KATA KUNCI ZONA ===
     const HYPE_KEYWORDS = [
       'v!', 'v!!!!', 'v', 'kpop', 'skz', 'txt', 'bts', 'seventeen', 'enhypen',
       'drakor', 'k-drama', 'squid game', 'crash landing', 'kim seon ho',
@@ -307,13 +501,12 @@
       'pengen ilang', 'pengen ngilang', 'susah', 'buntu', 'mentok'
     ];
 
-    // === DETEKSI ZONA DARI ISI RANT ===
     function detectZone(content) {
       const lower = content.toLowerCase();
       if (HYPE_KEYWORDS.some(kw => lower.includes(kw))) return 'hype';
       if (NGUSAHAIN_KEYWORDS.some(kw => lower.includes(kw))) return 'ngusahain';
       if (SPILL_KEYWORDS.some(kw => lower.includes(kw))) return 'spill';
-      return 'spill'; // default
+      return 'spill';
     }
 
     // === STATE ===
@@ -323,7 +516,7 @@
     }
     document.getElementById('username-display').textContent = currentUser;
 
-    // === LOAD & SORTIR RANT ===
+    // === LOAD FEED ===
     async function loadFeed() {
       try {
         const rantsData = await supabaseFetch('rants', 'GET', null);
@@ -379,6 +572,87 @@
       });
     }
 
+    // === HANGOUTS ===
+    async function loadHangouts() {
+      try {
+        const data = await supabaseFetch('hangouts', 'GET', null, '?order=created_at.desc');
+        
+        const gems = data.filter(h => h.category === 'gems');
+        const wfh = data.filter(h => h.category === 'wfh');
+        const food = data.filter(h => h.category === 'food');
+
+        renderHangouts('gems', gems);
+        renderHangouts('wfh', wfh);
+        renderHangouts('food', food);
+      } catch (e) {
+        console.error('Gagal muat hangouts:', e);
+        renderHangouts('gems', []);
+        renderHangouts('wfh', []);
+        renderHangouts('food', []);
+      }
+    }
+
+    function renderHangouts(category, items) {
+      const container = document.getElementById(`hangouts-${category}`);
+      container.innerHTML = '';
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="empty-zone">Belum ada rekomendasi.</div>';
+        return;
+      }
+
+      items.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'hangout-item';
+        el.innerHTML = `
+          <div class="hangout-header">
+            <span class="hangout-name">${item.name}</span>
+            ${item.is_admin_curated ? '<span class="hangout-badge admin-badge">Admin</span>' : ''}
+          </div>
+          <div class="hangout-location">📍 ${item.location}</div>
+          ${item.notes ? `<div style="font-size: 12px; color: var(--muted); margin-top: 6px;">${item.notes}</div>` : ''}
+          <div style="font-size: 11px; color: var(--muted); margin-top: 6px;">oleh @${item.username}</div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function openAddHangout(category) {
+      document.getElementById('input-category').value = category;
+      document.getElementById('modal-add').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-add').classList.remove('active');
+      document.getElementById('form-hangout').reset();
+    }
+
+    document.getElementById('form-hangout').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('input-name').value;
+      const location = document.getElementById('input-location').value;
+      const category = document.getElementById('input-category').value;
+      const notes = document.getElementById('input-notes').value;
+
+      try {
+        await supabaseFetch('hangouts', 'POST', {
+          name,
+          location,
+          category,
+          notes,
+          username: currentUser,
+          is_admin_curated: false
+        });
+
+        closeModal();
+        loadHangouts();
+        triggerPulse();
+      } catch (e) {
+        alert('Gagal menambahkan hangout: ' + e.message);
+      }
+    });
+
     // === NAVIGASI ===
     function navigateTo(page) {
       window.location.href = page;
@@ -391,7 +665,6 @@
       }
     }
 
-    // === RITUAL: PULSE ===
     function triggerPulse() {
       const pulse = document.createElement('div');
       pulse.className = 'pulse-animation';
@@ -407,7 +680,13 @@
       document.getElementById('nav-glitch').onclick = () => navigateTo('glitch.html');
       document.getElementById('settings-btn').onclick = logout;
 
-      loadFeed().then(triggerPulse);
+      loadFeed();
+      loadHangouts().then(triggerPulse);
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('modal-add').addEventListener('click', (e) => {
+      if (e.target.id === 'modal-add') closeModal();
     });
   </script>
 </body>
