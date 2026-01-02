@@ -484,11 +484,11 @@
     // === LOAD DATA ===
     async function loadFeed() {
       try {
-        const rants = await supabase.from('rants').select('*');
-        if (rant.error) throw rant.error;
+        const { , error } = await supabase.from('rants').select('*');
+        if (error) throw error;
 
         const hype = [], ngusahain = [], spill = [];
-        rants.data.forEach(r => {
+        data.forEach(r => {
           const zone = detectZone(r.content);
           if (zone === 'hype') hype.push(r);
           else if (zone === 'ngusahain') ngusahain.push(r);
@@ -536,7 +536,6 @@
       const category = document.getElementById('input-category').value;
       const notes = document.getElementById('input-notes').value;
 
-      // Ambil user ID dari session
       const {  { session } } = await supabase.auth.getSession();
       if (!session) {
         alert('Sesi habis. Silakan login ulang.');
@@ -562,9 +561,28 @@
       }
     });
 
-    // === NAVIGASI ===
-    function navigateTo(page) {
-      window.location.href = page;
+    // === NAVIGASI (SELALU AKTIF) ===
+    function setupNavigation() {
+      document.getElementById('nav-jejak')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'jejak.html';
+      });
+      document.getElementById('nav-frekuensi')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'index.html';
+      });
+      document.getElementById('nav-saynope')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'saynope.html';
+      });
+      document.getElementById('nav-glitch')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'glitch.html';
+      });
+      document.getElementById('settings-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        logout();
+      });
     }
 
     function logout() {
@@ -574,23 +592,14 @@
       }
     }
 
-    // === INIT ===
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Setup navigasi
-      document.getElementById('nav-jejak').onclick = () => navigateTo('jejak.html');
-      document.getElementById('nav-frekuensi').onclick = () => navigateTo('index.html');
-      document.getElementById('nav-saynope').onclick = () => navigateTo('saynope.html');
-      document.getElementById('nav-glitch').onclick = () => navigateTo('glitch.html');
-      document.getElementById('settings-btn').onclick = logout;
-
-      // Cek auth via Supabase
+    // === AUTH + LOAD ===
+    async function checkAuthAndLoad() {
       const {  { session } } = await supabase.auth.getSession();
       if (!session) {
         window.location.href = 'login.html';
         return;
       }
 
-      // Ambil username dari profiles
       try {
         const {  profile } = await supabase
           .from('profiles')
@@ -602,12 +611,16 @@
         window.CURRENT_USERNAME = 'frekuensi';
       }
 
-      // Muat data
       loadFeed();
       loadHangouts();
+    }
 
-      // Modal close
-      document.getElementById('modal-add').addEventListener('click', (e) => {
+    // === INIT ===
+    document.addEventListener('DOMContentLoaded', () => {
+      setupNavigation();
+      checkAuthAndLoad();
+
+      document.getElementById('modal-add')?.addEventListener('click', (e) => {
         if (e.target.id === 'modal-add') closeModal();
       });
     });
