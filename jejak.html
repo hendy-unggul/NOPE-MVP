@@ -429,27 +429,25 @@
 
     // === MUAT DATA ===
     async function loadData() {
-      try {
-        await ensureUserExists();
+  try {
+    await ensureUserExists();
 
-        // Load artefacts
-        const artefactsData = await supabaseFetch('artefacts', 'GET', null, `?username=eq.${currentUser}&order=created_at.desc&limit=6`);
-        artefacts = artefactsData;
+    // Load artefacts — pastikan ambil semua, bukan cuma milik currentUser
+    const artefactsData = await supabaseFetch('artefacts', 'GET', null, '?order=created_at.desc&limit=6');
+    artefacts = artefactsData;
 
-        // Load rants
-        const rantsData = await supabaseFetch('rants', 'GET', null, `?username=eq.${currentUser}&order=created_at.desc&limit=5`);
-        rants = rantsData;
+    // Load rants — tetap milik currentUser
+    const rantsData = await supabaseFetch('rants', 'GET', null, `?username=eq.${currentUser}&order=created_at.desc&limit=5`);
+    rants = rantsData;
 
-        renderHero();
-        renderDiary();
-        renderTray();
-
-      } catch (e) {
-        console.error('Error saat load data:', e);
-        showConfirmation("Gagal memuat data. Coba refresh.");
-      }
-    }
-
+    renderHero();
+    renderDiary();
+    renderTray();
+  } catch (e) {
+    console.error('Error saat load data:', e);
+    showConfirmation("Gagal memuat data. Coba refresh.");
+  }
+}
     // === RENDER ===
     function renderHero() {
       if (artefacts.length > 0) {
