@@ -717,7 +717,7 @@
     // === LOAD ZONES ===
     async function loadFeed() {
       try {
-        const rantsData = await supabaseFetch('rants', 'GET', null);
+        const rantsData = await supabaseFetch('rants', 'GET', null, '?order=created_at.desc&limit=100');
         const allRants = rantsData || [];
 
         const hype = [], ngusahain = [], spill = [];
