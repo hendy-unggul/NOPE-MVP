@@ -1029,6 +1029,7 @@ async function saveReaction(rantId, emoji) {
       document.getElementById('settings-btn').onclick = logout;
 
       // Load data
+      let rantsDataCache = [];
       loadFeed();
       loadHangouts();
       setTimeout(triggerPulse, 300);
