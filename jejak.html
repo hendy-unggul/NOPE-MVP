@@ -635,6 +635,72 @@
         window.location.href = 'index.html';
       }
     }
+    // === EMOJI COUNTER UNTUK JEJAK ===
+const EMOJI_LABELS = {
+  '🤠': 'Aku ngerti banget',
+  '😢': 'Nangis bareng',
+  '🤗': 'Peluk virtual',
+  '🔥': 'Ini bikin kaget'
+};
+
+async function fetchReactionStats(rantId) {
+  try {
+    const data = await supabaseFetch('reactions', 'GET', null);
+    const filtered = data.filter(r => r.rant_id === rantId);
+    const stats = { '🤠': { count: 0, users: [] }, '😢': { count: 0, users: [] }, '🤗': { count: 0, users: [] }, '🔥': { count: 0, users: [] } };
+    filtered.forEach(row => {
+      if (stats[row.emoji]) {
+        stats[row.emoji].count++;
+        if (stats[row.emoji].users.length < 3) {
+          stats[row.emoji].users.push(row.user_id);
+        }
+      }
+    });
+    return stats;
+  } catch (e) {
+    console.error('Gagal ambil reaksi:', e);
+    return { '🤠': { count: 0, users: [] }, '😢': { count: 0, users: [] }, '🤗': { count: 0, users: [] }, '🔥': { count: 0, users: [] } };
+  }
+}
+
+function showUserList(emoji, users) {
+  const old = document.getElementById('reaction-modal');
+  if (old) old.remove();
+  if (users.length === 0) return;
+
+  const modal = document.createElement('div');
+  modal.id = 'reaction-modal';
+  modal.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 10, 10, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 12px 16px;
+    z-index: 1000;
+    font-size: 13px;
+    color: #f5f5f5;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    max-width: 90%;
+  `;
+  const title = document.createElement('div');
+  title.textContent = `${emoji} ${EMOJI_LABELS[emoji]}`;
+  title.style.fontSize = '14px';
+  title.style.fontWeight = '600';
+  title.style.marginBottom = '6px';
+  const userList = document.createElement('div');
+  userList.textContent = users.map(u => `@${u}`).join(', ');
+  userList.style.fontSize = '12px';
+  userList.style.color = '#a0a0a0';
+  modal.appendChild(title);
+  modal.appendChild(userList);
+  document.body.appendChild(modal);
+  setTimeout(() => { if (modal.parentNode) modal.parentNode.removeChild(modal); }, 3000);
+  modal.onclick = () => modal.remove();
+}
 
     // === INIT LISTENERS ===
     document.addEventListener('DOMContentLoaded', () => {
