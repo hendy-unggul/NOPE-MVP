@@ -85,7 +85,7 @@
       aspect-ratio: 4 / 5;
       background: var(--surface);
       border-radius: 0 0 24px 24px;
-      overflow: hidden; /* ✅ FIX: hilangkan garis putih */
+      overflow: hidden;
       margin-bottom: 16px;
     }
     .hero img {
@@ -184,7 +184,6 @@
       font-weight: 600;
       white-space: nowrap;
     }
-    /* ✅ HAPUS "tinggalkan jejakmu..." */
     .rant-box-header::after {
       content: "";
     }
@@ -340,7 +339,6 @@
       <div class="rant-box-header">
         Hello <strong>@<span id="username-display"></span></strong>
       </div>
-      <!-- ✅ PERKECIL FONT & TARUH DI BAWAH -->
       <div style="font-size:12px; color:var(--muted); margin-top:4px;">...jejakmu dalam 300 huruf</div>
       <textarea id="rant" maxlength="300" placeholder=""></textarea>
       <button class="rant-cta" id="jejakkan-btn">Jejakkan</button>
@@ -429,25 +427,31 @@
 
     // === MUAT DATA ===
     async function loadData() {
-  try {
-    await ensureUserExists();
+      try {
+        await ensureUserExists();
 
-    // Load artefacts — pastikan ambil semua, bukan cuma milik currentUser
-    const artefactsData = await supabaseFetch('artefacts', 'GET', null, '?order=created_at.desc&limit=6');
-    artefacts = artefactsData;
+        // Load artefacts — HANYA MILIK CURRENT USER
+        const artefactsData = await supabaseFetch('artefacts', 'GET', null, 
+          `?username=eq.${encodeURIComponent(currentUser)}&order=created_at.desc&limit=6`
+        );
+        artefacts = artefactsData;
 
-    // Load rants — tetap milik currentUser
-    const rantsData = await supabaseFetch('rants', 'GET', null, `?username=eq.${currentUser}&order=created_at.desc&limit=5`);
-    rants = rantsData;
+        // Load rants — HANYA MILIK CURRENT USER
+        const rantsData = await supabaseFetch('rants', 'GET', null, 
+          `?username=eq.${encodeURIComponent(currentUser)}&order=created_at.desc&limit=5`
+        );
+        rants = rantsData;
 
-    renderHero();
-    renderDiary();
-    renderTray();
-  } catch (e) {
-    console.error('Error saat load data:', e);
-    showConfirmation("Gagal memuat data. Coba refresh.");
-  }
-}
+        renderHero();
+        renderDiary();
+        renderTray();
+
+      } catch (e) {
+        console.error('Error saat load data:', e);
+        showConfirmation("Gagal memuat data. Coba refresh.");
+      }
+    }
+
     // === RENDER ===
     function renderHero() {
       if (artefacts.length > 0) {
@@ -606,14 +610,14 @@
       if (!file) return;
 
       showConfirmation("Mengunggah...");
-      const fileName = `${currentUser}/${Date.now()}-${file.name}`;
+      const fileName = `${currentUser.replace(/^@/, '')}/${Date.now()}-${file.name}`;
 
       try {
         // Upload ke Supabase Storage via URL
         const formData = new FormData();
         formData.append('file', file);
 
-        const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/artefacts/${fileName}`, {
+        const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/public/artefacts/${fileName}`, {
           method: 'POST',
           headers: {
             'apikey': SUPABASE_KEY,
@@ -626,9 +630,9 @@
           throw new Error(`Upload gagal: ${await uploadRes.text()}`);
         }
 
+        // ✅ URL HARUS PAKAI /public/
         const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/artefacts/${fileName}`;
 
-        // Simpan ke tabel artefacts
         await supabaseFetch('artefacts', 'POST', {
           username: currentUser,
           image_url: imageUrl,
