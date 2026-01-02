@@ -982,6 +982,42 @@
 
       postEl.appendChild(emojiBar);
     }
+    // === SIMPAN REAKSI DI FREKUENSI ===
+async function saveReaction(rantId, emoji) {
+  try {
+    // Jangan izinkan merespon rant sendiri
+    const rant = rantsDataCache.find(r => r.id === rantId);
+    if (rant && rant.username === currentUser) {
+      console.log('Tidak boleh merespon rant sendiri.');
+      return;
+    }
+
+    // Cek apakah user sudah pernah kasih reaksi ini
+    const existing = await supabaseFetch('reactions', 'GET', null, 
+      `?rant_id=eq.${rantId}&user_id=eq.${currentUser}&emoji=eq.${encodeURIComponent(emoji)}`
+    );
+
+    if (existing.length > 0) {
+      // Batalkan (hapus)
+      await supabaseFetch('reactions', 'DELETE', null, 
+        `?id=eq.${existing[0].id}`
+      );
+    } else {
+      // Simpan baru
+      await supabaseFetch('reactions', 'POST', {
+        rant_id: rantId,
+        user_id: currentUser,
+        emoji: emoji
+      });
+    }
+
+    // Opsional: trigger pulse
+    triggerPulse();
+
+  } catch (e) {
+    console.error('Gagal simpan reaksi:', e);
+  }
+}
 
     // === INIT ===
     document.addEventListener('DOMContentLoaded', () => {
