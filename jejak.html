@@ -238,12 +238,15 @@
       display: block;
       margin-bottom: 2px;
     }
+    
+    /* === TRAY 6 KOTAK === */
     .tray {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(2, 1fr);
       gap: 8px;
       padding: 0 16px 16px;
+      min-height: calc(2 * (100vw - 32px) / 3);
     }
     .tray-slot {
       aspect-ratio: 1;
@@ -255,6 +258,15 @@
       position: relative;
       cursor: pointer;
       transition: all 0.2s;
+      overflow: hidden;
+    }
+    .tray-slot.filled {
+      border-color: var(--accent);
+    }
+    .tray-slot.empty {
+      background: linear-gradient(45deg, var(--surface) 25%, #1a1a1a 25%, #1a1a1a 50%, var(--surface) 50%, var(--surface) 75%, #1a1a1a 75%, #1a1a1a);
+      background-size: 8px 8px;
+      opacity: 0.3;
     }
     .tray-slot:hover {
       border-color: var(--accent);
@@ -265,6 +277,32 @@
       left: 6px;
       font-size: 10px;
       padding: 3px 5px;
+    }
+    .tray-slot .upload-date {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: rgba(0,0,0,0.7);
+      color: #aaa;
+      font-size: 9px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      backdrop-filter: blur(2px);
+    }
+    .tray-slot .slot-number {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(0,0,0,0.7);
+      color: var(--text);
+      font-size: 10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
     }
     .tagline {
       text-align: center;
@@ -289,7 +327,90 @@
       border-radius: 8px;
       margin: 16px 0;
     }
-
+    
+    /* === UPLOAD STATUS === */
+    .upload-status {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 8px 16px;
+      margin-top: -8px;
+    }
+    .upload-status .count {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    
+    /* === MODAL DETAIL ARTEFAK === */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      backdrop-filter: blur(10px);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-content {
+      max-width: 90%;
+      max-height: 80vh;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 32px;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-image {
+      max-width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .modal-notation {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: center;
+      color: #fff;
+    }
+    .modal-date {
+      font-size: 13px;
+      color: #aaa;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .modal-delete-btn {
+      background: #ff4444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 16px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
     /* === RITUAL: PULSE === */
     .pulse-animation {
       position: fixed;
@@ -306,6 +427,22 @@
     @keyframes pulse {
       0% { transform: scale(0.8); opacity: 0.7; }
       100% { transform: scale(1.8); opacity: 0; }
+    }
+    
+    /* === ANIMASI UPLOAD BARU === */
+    @keyframes new-upload-pulse {
+      0% { transform: scale(0.9); opacity: 0; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .new-upload {
+      animation: new-upload-pulse 0.6s ease-out;
+    }
+    
+    /* === PULSE UNTUK REAKSI === */
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
     }
   </style>
 </head>
@@ -346,6 +483,11 @@
     </div>
 
     <div class="diary" id="diary"></div>
+    
+    <div class="upload-status" id="upload-status">
+      Arsip artefak: <span class="count" id="artefak-count">0</span>/6 • Upload berikutnya: <span class="count" id="next-upload">Bisa sekarang</span>
+    </div>
+    
     <div class="tray" id="tray"></div>
 
     <div class="tagline">
@@ -412,6 +554,42 @@
       postUploadPanel.classList.add('hidden');
     }
 
+    // === CEK 30 HARI ===
+    function canUploadNewArtefact() {
+      if (artefacts.length === 0) return true;
+      
+      const latestArtefact = artefacts.reduce((latest, current) => {
+        const latestDate = new Date(latest.created_at);
+        const currentDate = new Date(current.created_at);
+        return currentDate > latestDate ? current : latest;
+      });
+      
+      const lastUpload = new Date(latestArtefact.created_at);
+      const now = new Date();
+      const daysDiff = Math.floor((now - lastUpload) / (1000 * 60 * 60 * 24));
+      
+      return daysDiff >= 30;
+    }
+
+    function getDaysUntilNextUpload() {
+      if (artefacts.length === 0) return 0;
+      
+      const latestArtefact = artefacts.reduce((latest, current) => {
+        const latestDate = new Date(latest.created_at);
+        const currentDate = new Date(current.created_at);
+        return currentDate > latestDate ? current : latest;
+      });
+      
+      const lastUpload = new Date(latestArtefact.created_at);
+      const nextUploadDate = new Date(lastUpload);
+      nextUploadDate.setDate(nextUploadDate.getDate() + 30);
+      
+      const now = new Date();
+      const daysLeft = Math.ceil((nextUploadDate - now) / (1000 * 60 * 60 * 24));
+      
+      return daysLeft > 0 ? daysLeft : 0;
+    }
+
     // === DATABASE ===
     async function ensureUserExists() {
       try {
@@ -430,13 +608,13 @@
       try {
         await ensureUserExists();
 
-        // Load artefacts — HANYA MILIK CURRENT USER
+        // Load artefacts
         const artefactsData = await supabaseFetch('artefacts', 'GET', null, 
           `?username=eq.${encodeURIComponent(currentUser)}&order=created_at.desc&limit=6`
         );
         artefacts = artefactsData;
 
-        // Load rants — HANYA MILIK CURRENT USER
+        // Load rants
         const rantsData = await supabaseFetch('rants', 'GET', null, 
           `?username=eq.${encodeURIComponent(currentUser)}&order=created_at.desc&limit=5`
         );
@@ -445,6 +623,7 @@
         renderHero();
         renderDiary();
         renderTray();
+        updateUploadStatus();
 
       } catch (e) {
         console.error('Error saat load data:', e);
@@ -481,7 +660,7 @@
         entry.innerHTML = `<time>${date}</time><p>${r.content}</p>`;
         container.appendChild(entry);
 
-        // --- TAMBAHKAN EMOJI + COUNTER ---
+        // Emoji reactions
         const reactionsContainer = document.createElement('div');
         reactionsContainer.style.display = 'flex';
         reactionsContainer.style.gap = '12px';
@@ -513,26 +692,15 @@
 
             if (count > 0) {
               countSpan.style.animation = 'pulse-glow 2s infinite';
-              if (!document.getElementById('pulse-style')) {
-                const style = document.createElement('style');
-                style.id = 'pulse-style';
-                style.textContent = `
-                  @keyframes pulse-glow {
-                    0%, 100% { opacity: 0.7; }
-                    50% { opacity: 1; }
-                  }
-                `;
-                document.head.appendChild(style);
-              }
             }
 
-            // ⚡️ KLIK EMOJI → SIMPAN REAKSI
+            // Klik emoji
             item.onclick = (e) => {
               e.stopPropagation();
-              saveReaction(r.id, emoji); // ← INI YANG PENTING!
+              saveReaction(r.id, emoji);
             };
 
-            // Hover → efek visual
+            // Hover efek
             item.onmouseenter = () => {
               emojiSpan.style.transform = 'scale(1.2)';
               emojiSpan.style.opacity = '1';
@@ -545,7 +713,7 @@
             item.appendChild(emojiSpan);
             item.appendChild(countSpan);
 
-            // Jika diklik, tampilkan 3 username terakhir
+            // Tampilkan username jika diklik
             item.onclick = (e) => {
               e.stopPropagation();
               showUserList(emoji, users);
@@ -563,45 +731,191 @@
       const tray = document.getElementById('tray');
       tray.innerHTML = '';
 
-      if (artefacts.length === 0) {
-        tray.innerHTML = '<div class="empty-state">Belum ada artefak. Unggah gambar pertamamu!</div>';
-        return;
-      }
-
-      artefacts.slice(0, 6).forEach(a => {
-        const div = document.createElement('div');
-        div.className = 'tray-slot';
-        div.style.backgroundImage = `url(${a.image_url})`;
-        if (a.notation) {
-          const notationEl = document.createElement('div');
-          notationEl.className = 'artefak-notation';
-          notationEl.textContent = a.notation;
-          div.appendChild(notationEl);
-        }
-        // ✅ KLIK UNTUK LIHAT REAKSI
-        div.onclick = async () => {
-          try {
-            const reactions = await supabaseFetch('reactions', 'GET', null);
-            const filtered = reactions.filter(r => r.artefact_id === a.id);
-
-            const stats = { '🤠': { count: 0, users: [] }, '😢': { count: 0, users: [] }, '🤗': { count: 0, users: [] }, '🔥': { count: 0, users: [] } };
-            filtered.forEach(row => {
-              if (stats[row.emoji]) {
-                stats[row.emoji].count++;
-                if (stats[row.emoji].users.length < 3) {
-                  stats[row.emoji].users.push(row.user_id);
-                }
-              }
-            });
-
-            // Tampilkan modal reaksi
-            showReactionModal(a.id, stats);
-          } catch (e) {
-            console.error('Gagal ambil reaksi:', e);
+      // Buat 6 slot
+      for (let i = 0; i < 6; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'tray-slot';
+        slot.id = `slot-${i}`;
+        
+        if (i < artefacts.length) {
+          // Slot terisi
+          const artefact = artefacts[i];
+          slot.style.backgroundImage = `url(${artefact.image_url})`;
+          slot.classList.add('filled');
+          
+          // Notasi
+          if (artefact.notation) {
+            const notationEl = document.createElement('div');
+            notationEl.className = 'artefak-notation';
+            notationEl.textContent = artefact.notation;
+            slot.appendChild(notationEl);
           }
-        };
-        tray.appendChild(div);
-      });
+          
+          // Nomor slot
+          const slotNumber = document.createElement('div');
+          slotNumber.className = 'slot-number';
+          slotNumber.textContent = i + 1;
+          slot.appendChild(slotNumber);
+          
+          // Tanggal upload
+          const dateEl = document.createElement('div');
+          dateEl.className = 'upload-date';
+          const uploadDate = new Date(artefact.created_at);
+          dateEl.textContent = uploadDate.toLocaleDateString('id-ID', { 
+            day: 'numeric', 
+            month: 'short' 
+          });
+          slot.appendChild(dateEl);
+          
+          // Klik untuk lihat detail
+          slot.onclick = () => showArtefactModal(artefact);
+          
+        } else {
+          // Slot kosong
+          slot.classList.add('empty');
+          slot.style.cursor = 'default';
+          
+          const plusIcon = document.createElement('div');
+          plusIcon.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: var(--muted);
+            opacity: 0.3;
+          `;
+          plusIcon.textContent = '+';
+          slot.appendChild(plusIcon);
+          
+          // Nomor slot untuk yang kosong juga
+          const slotNumber = document.createElement('div');
+          slotNumber.className = 'slot-number';
+          slotNumber.textContent = i + 1;
+          slot.appendChild(slotNumber);
+        }
+        
+        tray.appendChild(slot);
+      }
+      
+      updateUploadButton();
+    }
+
+    function updateUploadStatus() {
+      const countEl = document.getElementById('artefak-count');
+      const nextEl = document.getElementById('next-upload');
+      
+      countEl.textContent = artefacts.length;
+      
+      if (artefacts.length >= 6) {
+        nextEl.textContent = 'Arsip penuh';
+        nextEl.style.color = '#ff4444';
+      } else if (!canUploadNewArtefact()) {
+        const daysLeft = getDaysUntilNextUpload();
+        nextEl.textContent = `${daysLeft} hari lagi`;
+        nextEl.style.color = '#ffaa00';
+      } else {
+        nextEl.textContent = 'Bisa sekarang';
+        nextEl.style.color = '#00ff00';
+      }
+    }
+
+    function updateUploadButton() {
+      const btn = document.getElementById('upload-artefak-btn');
+      
+      if (artefacts.length >= 6) {
+        btn.textContent = 'Arsip Penuh';
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        btn.title = 'Arsip artefak sudah penuh (6/6)';
+      } else if (!canUploadNewArtefact()) {
+        const daysLeft = getDaysUntilNextUpload();
+        btn.textContent = `${daysLeft} hari lagi`;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        btn.title = `Bisa upload lagi dalam ${daysLeft} hari`;
+      } else {
+        btn.textContent = 'Unggah';
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        btn.title = 'Unggah artefak baru';
+      }
+    }
+
+    // === MODAL ARTEFAK ===
+    function showArtefactModal(artefact) {
+      // Hapus modal lama jika ada
+      const oldModal = document.querySelector('.modal-overlay');
+      if (oldModal) oldModal.remove();
+      
+      // Buat modal baru
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      
+      const content = document.createElement('div');
+      content.className = 'modal-content';
+      
+      // Gambar
+      const img = document.createElement('img');
+      img.src = artefact.image_url;
+      img.className = 'modal-image';
+      img.alt = 'Artefak';
+      
+      // Notasi
+      const notation = document.createElement('div');
+      notation.className = 'modal-notation';
+      notation.textContent = artefact.notation || '(Tanpa notasi)';
+      
+      // Tanggal
+      const date = document.createElement('div');
+      date.className = 'modal-date';
+      const uploadDate = new Date(artefact.created_at);
+      date.textContent = `Diunggah: ${uploadDate.toLocaleDateString('id-ID', { 
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}`;
+      
+      // Tombol close
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'modal-close';
+      closeBtn.textContent = '×';
+      closeBtn.onclick = () => modal.remove();
+      
+      // Tombol hapus
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'modal-delete-btn';
+      deleteBtn.textContent = 'Hapus Artefak';
+      deleteBtn.onclick = async () => {
+        if (confirm('Hapus artefak ini?')) {
+          try {
+            await supabaseFetch(`artefacts?id=eq.${artefact.id}`, 'DELETE');
+            await loadData();
+            modal.remove();
+            showConfirmation('Artefak dihapus');
+          } catch (e) {
+            alert('Gagal menghapus artefak');
+          }
+        }
+      };
+      
+      // Susun elemen
+      content.appendChild(closeBtn);
+      content.appendChild(img);
+      content.appendChild(notation);
+      content.appendChild(date);
+      content.appendChild(deleteBtn);
+      modal.appendChild(content);
+      
+      document.body.appendChild(modal);
+      
+      // Tutup modal klik di luar
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
     }
 
     // === UPLOAD ARTEFAK BARU ===
@@ -609,11 +923,23 @@
       const file = event.target.files[0];
       if (!file) return;
 
+      // Cek apakah bisa upload
+      if (artefacts.length >= 6) {
+        alert('Arsip artefak sudah penuh (6/6). Hapus salah satu artefak lama untuk menambah yang baru.');
+        return;
+      }
+      
+      if (!canUploadNewArtefact()) {
+        const daysLeft = getDaysUntilNextUpload();
+        alert(`Anda harus menunggu ${daysLeft} hari lagi sebelum bisa mengunggah artefak baru.`);
+        return;
+      }
+
       showConfirmation("Mengunggah...");
       const fileName = `${currentUser.replace(/^@/, '')}/${Date.now()}-${file.name}`;
 
       try {
-        // Upload ke Supabase Storage via URL
+        // Upload ke Supabase Storage
         const formData = new FormData();
         formData.append('file', file);
 
@@ -630,9 +956,10 @@
           throw new Error(`Upload gagal: ${await uploadRes.text()}`);
         }
 
-        // ✅ URL HARUS PAKAI /public/
+        // URL gambar
         const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/artefacts/${fileName}`;
 
+        // Simpan ke database
         await supabaseFetch('artefacts', 'POST', {
           username: currentUser,
           image_url: imageUrl,
@@ -641,7 +968,7 @@
 
         showConfirmation("Gambar diunggah! Tambahkan notasi (maks 4 kata).");
         await loadData();
-        showPostUploadPanel(); // ✅ Munculkan panel notasi setelah upload
+        showPostUploadPanel();
 
       } catch (e) {
         console.error('Upload error:', e);
@@ -666,14 +993,13 @@
       }
 
       try {
-        // ✅ Perbaikan: Gunakan filter di URL, bukan di parameter
         await supabaseFetch(`artefacts?id=eq.${artefacts[0].id}`, 'PATCH', {
           notation: text
         });
 
         showConfirmation("Notasi tersimpan.");
         await loadData();
-        hidePostUploadPanel(); // ✅ Sembunyikan panel setelah simpan
+        hidePostUploadPanel();
 
       } catch (e) {
         console.error('Notasi error:', e);
@@ -691,17 +1017,10 @@
       }
 
       try {
-        // ✅ Perbaikan: Pastikan nilai "zone" sesuai constraint
-        let zone = 'neutral'; // default
-
-        // 👇 Optional: Auto-detect zone via kata kunci
-        // if (content.toLowerCase().includes('senang') || content.toLowerCase().includes('bahagia')) zone = 'positive';
-        // if (content.toLowerCase().includes('sedih') || content.toLowerCase().includes('marah')) zone = 'negative';
-
         await supabaseFetch('rants', 'POST', {
           username: currentUser,
           content,
-          zone: zone // ✅ Nilai ini HARUS sesuai constraint
+          zone: 'neutral'
         });
 
         document.getElementById('rant').value = '';
@@ -714,19 +1033,7 @@
       }
     }
 
-    // === NAVIGASI & LOGOUT ===
-    function navigateTo(page) {
-      window.location.href = page;
-    }
-
-    function logout() {
-      if (confirm('Keluar dari akun?')) {
-        localStorage.removeItem('nope_username');
-        window.location.href = 'index.html';
-      }
-    }
-
-    // === EMOJI COUNTER UNTUK JEJAK ===
+    // === REAKSI EMOJI ===
     const EMOJI_LABELS = {
       '🤠': 'Aku ngerti banget',
       '😢': 'Nangis bareng',
@@ -738,7 +1045,12 @@
       try {
         const data = await supabaseFetch('reactions', 'GET', null);
         const filtered = data.filter(r => r.rant_id === rantId);
-        const stats = { '🤠': { count: 0, users: [] }, '😢': { count: 0, users: [] }, '🤗': { count: 0, users: [] }, '🔥': { count: 0, users: [] } };
+        const stats = { 
+          '🤠': { count: 0, users: [] }, 
+          '😢': { count: 0, users: [] }, 
+          '🤗': { count: 0, users: [] }, 
+          '🔥': { count: 0, users: [] } 
+        };
         filtered.forEach(row => {
           if (stats[row.emoji]) {
             stats[row.emoji].count++;
@@ -751,6 +1063,22 @@
       } catch (e) {
         console.error('Gagal ambil reaksi:', e);
         return { '🤠': { count: 0, users: [] }, '😢': { count: 0, users: [] }, '🤗': { count: 0, users: [] }, '🔥': { count: 0, users: [] } };
+      }
+    }
+
+    async function saveReaction(rantId, emoji) {
+      try {
+        await supabaseFetch('reactions', 'POST', {
+          rant_id: rantId,
+          emoji: emoji,
+          user_id: currentUser
+        });
+        
+        // Refresh data
+        await loadData();
+        
+      } catch (e) {
+        console.error('Gagal simpan reaksi:', e);
       }
     }
 
@@ -777,28 +1105,60 @@
         box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         max-width: 90%;
       `;
+      
       const title = document.createElement('div');
       title.textContent = `${emoji} ${EMOJI_LABELS[emoji]}`;
       title.style.fontSize = '14px';
       title.style.fontWeight = '600';
       title.style.marginBottom = '6px';
+      
       const userList = document.createElement('div');
       userList.textContent = users.map(u => `@${u}`).join(', ');
       userList.style.fontSize = '12px';
       userList.style.color = '#a0a0a0';
+      
       modal.appendChild(title);
       modal.appendChild(userList);
       document.body.appendChild(modal);
-      setTimeout(() => { if (modal.parentNode) modal.parentNode.removeChild(modal); }, 3000);
+      
+      setTimeout(() => { 
+        if (modal.parentNode) modal.parentNode.removeChild(modal); 
+      }, 3000);
+      
       modal.onclick = () => modal.remove();
+    }
+
+    // === NAVIGASI & LOGOUT ===
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      if (confirm('Keluar dari akun?')) {
+        localStorage.removeItem('nope_username');
+        window.location.href = 'index.html';
+      }
     }
 
     // === INIT LISTENERS ===
     document.addEventListener('DOMContentLoaded', () => {
-      // Upload
+      // Upload artefak
       document.getElementById('upload-artefak-btn').addEventListener('click', () => {
+        // Cek sebelum upload
+        if (artefacts.length >= 6) {
+          alert('Arsip artefak sudah penuh (6/6). Hapus salah satu artefak lama untuk menambah yang baru.');
+          return;
+        }
+        
+        if (!canUploadNewArtefact()) {
+          const daysLeft = getDaysUntilNextUpload();
+          alert(`Anda harus menunggu ${daysLeft} hari lagi sebelum bisa mengunggah artefak baru.`);
+          return;
+        }
+        
         document.getElementById('file-input').click();
       });
+      
       document.getElementById('file-input').addEventListener('change', handleFileSelect);
 
       // Notasi
@@ -817,7 +1177,7 @@
       document.getElementById('nav-glitch').addEventListener('click', () => navigateTo('glitch.html'));
       document.getElementById('settings-btn').addEventListener('click', logout);
 
-      // Load data
+      // Load data awal
       loadData();
     });
   </script>
