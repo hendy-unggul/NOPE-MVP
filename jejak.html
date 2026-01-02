@@ -473,24 +473,72 @@
       }
     }
 
-    function renderDiary() {
-      const container = document.getElementById('diary');
-      container.innerHTML = '';
+function renderDiary() {
+  const container = document.getElementById('diary');
+  container.innerHTML = '';
 
-      if (rants.length === 0) {
-        container.innerHTML = '<div class="empty-state">Belum ada jejak. Tinggalkan jejak pertamamu!</div>';
-        return;
-      }
+  if (rants.length === 0) {
+    container.innerHTML = '<div class="empty-state">Belum ada jejak. Tinggalkan jejak pertamamu!</div>';
+    return;
+  }
 
-      rants.forEach(r => {
-        const entry = document.createElement('div');
-        entry.className = 'diary-entry';
-        const date = new Date(r.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
-        entry.innerHTML = `<time>${date}</time><p>${r.content}</p>`;
-        container.appendChild(entry);
+  rants.forEach(r => {
+    const entry = document.createElement('div');
+    entry.className = 'diary-entry';
+    const date = new Date(r.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+    entry.innerHTML = `<time>${date}</time><p>${r.content}</p>`;
+    container.appendChild(entry);
+
+    // --- TAMBAHKAN COUNTER DI BAWAH SETIAP JEJAK ---
+    const reactionsContainer = document.createElement('div');
+    reactionsContainer.style.display = 'flex';
+    reactionsContainer.style.gap = '12px';
+    reactionsContainer.style.marginTop = '8px';
+    reactionsContainer.style.fontSize = '15px';
+    reactionsContainer.style.opacity = '0.9';
+
+    fetchReactionStats(r.id).then(stats => {
+      ['🤠', '😢', '🤗', '🔥'].forEach(emoji => {
+        const count = stats[emoji].count;
+        const users = stats[emoji].users;
+        const item = document.createElement('div');
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.style.gap = '4px';
+        item.style.cursor = count > 0 ? 'pointer' : 'default';
+        const emojiSpan = document.createElement('span');
+        emojiSpan.textContent = emoji;
+        const countSpan = document.createElement('span');
+        countSpan.textContent = count;
+        countSpan.style.fontSize = '13px';
+        countSpan.style.color = count > 0 ? '#a0a0a0' : 'transparent';
+        if (count > 0) {
+          countSpan.style.animation = 'pulse-glow 2s infinite';
+          if (!document.getElementById('pulse-style')) {
+            const style = document.createElement('style');
+            style.id = 'pulse-style';
+            style.textContent = `
+              @keyframes pulse-glow {
+                0%, 100% { opacity: 0.7; }
+                50% { opacity: 1; }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+          item.onclick = (e) => {
+            e.stopPropagation();
+            showUserList(emoji, users);
+          };
+        }
+        item.appendChild(emojiSpan);
+        item.appendChild(countSpan);
+        reactionsContainer.appendChild(item);
       });
-    }
+    });
 
+    entry.appendChild(reactionsContainer);
+  });
+}
     function renderTray() {
       const tray = document.getElementById('tray');
       tray.innerHTML = '';
