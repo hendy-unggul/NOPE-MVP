@@ -512,6 +512,11 @@
         font-size: 13px;
       }
     }
+
+    /* Tooltip emoji */
+    .post-emojis {
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -717,6 +722,7 @@
     // === LOAD ZONES ===
     async function loadFeed() {
       try {
+        // ✅ FIX: Tambahkan order by created_at DESC
         const rantsData = await supabaseFetch('rants', 'GET', null, '?order=created_at.desc&limit=100');
         const allRants = rantsData || [];
 
@@ -762,6 +768,8 @@
           <div class="post-content">${post.content}</div>
         `;
         container.appendChild(el);
+        // ✅ TAMBAHKAN EMOJI SETELAH DIPASANG DI DOM
+        renderEmojiButtons(el, post.id);
       });
     }
 
@@ -869,6 +877,114 @@
       pulse.className = 'pulse-animation';
       document.body.appendChild(pulse);
       setTimeout(() => pulse.remove(), 1000);
+    }
+
+    // === EMOJI REACTIONS ===
+    const EMOJIS = ['🤠', '😢', '🤗', '🔥'];
+    const REACTIONS_TABLE = 'reactions';
+
+    // Simpan reaksi ke Supabase
+    async function saveReaction(rantId, emoji) {
+      try {
+        // Cek apakah user sudah pernah kasih reaksi ini
+        const existing = await supabaseFetch(REACTIONS_TABLE, 'GET', null, 
+          `?rant_id=eq.${rantId}&user_id=eq.${currentUser}&emoji=eq.${encodeURIComponent(emoji)}`
+        );
+
+        if (existing.length > 0) {
+          // Batalkan (hapus)
+          await supabaseFetch(REACTIONS_TABLE, 'DELETE', null, 
+            `?id=eq.${existing[0].id}`
+          );
+        } else {
+          // Simpan baru
+          await supabaseFetch(REACTIONS_TABLE, 'POST', {
+            rant_id: rantId,
+            user_id: currentUser,
+            emoji: emoji
+          });
+        }
+      } catch (e) {
+        console.error('Gagal simpan reaksi:', e);
+      }
+    }
+
+    // Render emoji buttons dengan tooltip hover
+    function renderEmojiButtons(postEl, rantId) {
+      const emojiBar = document.createElement('div');
+      emojiBar.className = 'post-emojis';
+      emojiBar.style.display = 'flex';
+      emojiBar.style.gap = '16px';
+      emojiBar.style.marginTop = '14px';
+      emojiBar.style.fontSize = '20px';
+      emojiBar.style.justifyContent = 'flex-start';
+
+      // Emoji + teks hover
+      const emojiConfig = [
+        { emoji: '🤠', label: 'Aku ngerti banget' },
+        { emoji: '😢', label: 'Nangis bareng' },
+        { emoji: '🤗', label: 'Peluk virtual' },
+        { emoji: '🔥', label: 'Ini bikin kaget' }
+      ];
+
+      emojiConfig.forEach(item => {
+        const container = document.createElement('div');
+        container.style.position = 'relative';
+        container.style.cursor = 'pointer';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.alignItems = 'center';
+
+        const emojiSpan = document.createElement('span');
+        emojiSpan.textContent = item.emoji;
+        emojiSpan.style.opacity = '0.85';
+        emojiSpan.style.transition = 'all 0.2s ease';
+
+        // Tooltip (teks hover)
+        const tooltip = document.createElement('div');
+        tooltip.textContent = item.label;
+        tooltip.style.position = 'absolute';
+        tooltip.style.bottom = '28px';
+        tooltip.style.left = '50%';
+        tooltip.style.transform = 'translateX(-50%)';
+        tooltip.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        tooltip.style.color = 'white';
+        tooltip.style.fontSize = '11px';
+        tooltip.style.padding = '4px 8px';
+        tooltip.style.borderRadius = '6px';
+        tooltip.style.whiteSpace = 'nowrap';
+        tooltip.style.opacity = '0';
+        tooltip.style.pointerEvents = 'none';
+        tooltip.style.transition = 'opacity 0.2s';
+        tooltip.style.zIndex = '10';
+
+        container.appendChild(emojiSpan);
+        container.appendChild(tooltip);
+
+        // Hover effect
+        container.onmouseenter = () => {
+          emojiSpan.style.opacity = '1';
+          emojiSpan.style.transform = 'scale(1.2)';
+          tooltip.style.opacity = '1';
+        };
+        container.onmouseleave = () => {
+          emojiSpan.style.opacity = '0.85';
+          emojiSpan.style.transform = 'scale(1)';
+          tooltip.style.opacity = '0';
+        };
+
+        // Klik
+        container.onclick = (e) => {
+          e.stopPropagation();
+          saveReaction(rantId, item.emoji);
+          emojiSpan.style.transform = 'scale(1.4)';
+          setTimeout(() => emojiSpan.style.transform = 'scale(1.2)', 150);
+        };
+
+        emojiBar.appendChild(container);
+      });
+
+      postEl.appendChild(emojiBar);
     }
 
     // === INIT ===
