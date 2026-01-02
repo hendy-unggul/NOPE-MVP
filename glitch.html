@@ -380,7 +380,7 @@
         meta: 'untuk yang lelah berakting jadi kuat',
         image: 'https://images.unsplash.com/photo-1631724315567-8a7e625d3d9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80',
         content: `
-          <p>“Kita memuji senyumnya — tapi lupa bertanya:<br>Di mana dia menangis?”</p>
+          <p>"Kita memuji senyumnya — tapi lupa bertanya:<br>Di mana dia menangis?"</p>
           <p>Reza Rahadian bukan aktor. Ia <strong>cermin zaman yang takut retak</strong>...</p>
           <blockquote class="quote">
             Ini bukan kritik pada Reza —<br>
@@ -394,12 +394,12 @@
       {
         id: 'musik',
         title: 'Hindia: Lagu untuk yang Lelah Menunggu',
-        meta: 'untuk yang janji “nanti” tapi hidupnya mandek',
+        meta: 'untuk yang janji "nanti" tapi hidupnya mandek',
         image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80',
-        content: `<p>“Kita terlalu sibuk mengejar ‘besok’ sampai lupa hidup hari ini.”</p>
+        content: `<p>"Kita terlalu sibuk mengejar 'besok' sampai lupa hidup hari ini."</p>
           <blockquote class="quote">
             ini lagu untuk yang pernah bilang:<br>
-            “gue nungguin dia berubah.”<br>
+            "gue nungguin dia berubah."<br>
             tapi yang berubah justru gue — jadi lebih kosong.
           </blockquote>
           <p>Karena kadang, kebahagiaan itu bukan sesuatu yang bisa diarsip — tapi sesuatu yang <strong>hilang begitu kamu coba foto</strong>.</p>
@@ -408,12 +408,12 @@
       {
         id: 'buku',
         title: 'Madilog: Senjata untuk yang Takut Berpikir',
-        meta: 'untuk yang lelah dikasih tahu “ikut aja”',
+        meta: 'untuk yang lelah dikasih tahu "ikut aja"',
         image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80',
-        content: `<p>“Di era algoritma, berani berpikir sendiri adalah bentuk perlawanan.”</p>
+        content: `<p>"Di era algoritma, berani berpikir sendiri adalah bentuk perlawanan."</p>
           <blockquote class="quote">
-            “seorang pejuang harus berani sendiri.<br>
-            karena kebenaran seringkali lahir di tempat yang sepi.”
+            "seorang pejuang harus berani sendiri.<br>
+            karena kebenaran seringkali lahir di tempat yang sepi."
           </blockquote>
           <p>Dan Tan Malaka bukan penulis — ia <strong>pelatih berpikir</strong>.</p>
           <div class="signature">— @HD, 1% petani 99% failure...</div>`
@@ -423,9 +423,9 @@
         title: 'Wawancara: @HD — "Aku Memilih Jadi Gagal"',
         meta: 'untuk yang takut disebut tidak cukup',
         image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80',
-        content: `<p>“Orang sukses punya roadmap. Aku punya peta kuburan mimpi.”</p>
+        content: `<p>"Orang sukses punya roadmap. Aku punya peta kuburan mimpi."</p>
           <p>Di ruang kecil ber-AC, @HD menyalakan rokok — padahal di luar hujan.<br>
-          “Saya bukan gagal karena tidak mencoba. Saya gagal karena mencoba terlalu banyak versi diri.”</p>
+          "Saya bukan gagal karena tidak mencoba. Saya gagal karena mencoba terlalu banyak versi diri."</p>
           <blockquote class="quote">
             Sistem ini tidak minta kita berhasil.<br>
             Sistem ini minta kita berhenti bertanya.
@@ -512,7 +512,7 @@
 
     document.getElementById('username-display').textContent = localStorage.getItem('nope_username') || 'kawan';
 
-    // === NAVIGASI ===
+    // === NAVIGASI (FIXED!) ===
     function navigateTo(page) {
       window.location.href = page;
     }
@@ -520,13 +520,13 @@
     function logout() {
       if (confirm('Keluar dari akun?')) {
         localStorage.removeItem('nope_username');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('nav-jejak').onclick = () => navigateTo('jejak.html');
-      document.getElementById('nav-frekuensi').onclick = () => navigateTo('index.html');
+      document.getElementById('nav-frekuensi').onclick = () => navigateTo('frekuensi.html'); // ✅ FIXED!
       document.getElementById('nav-saynope').onclick = () => navigateTo('saynope.html');
       document.getElementById('nav-glitch').onclick = () => navigateTo('glitch.html');
       document.getElementById('settings-btn').onclick = logout;
