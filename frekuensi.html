@@ -178,36 +178,7 @@
       gap: 12px;
     }
     
-    .post-item {
-      padding: 14px;
-      background: var(--surface-elevated);
-      border-radius: 12px;
-      transition: all 0.2s;
-      position: relative;
-    }
-    .post-item:hover {
-      background: var(--border);
-    }
-    .post-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .post-username {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-    .post-emoji {
-      font-size: 14px;
-    }
-    .post-content {
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.5;
-    }
-    
+    .post-item,
     .artefact-item {
       background: var(--surface-elevated);
       border: 1px solid var(--border);
@@ -216,46 +187,75 @@
       margin-bottom: 16px;
       transition: all 0.2s;
     }
+    .post-item:hover,
     .artefact-item:hover {
       border-color: var(--accent);
       transform: translateY(-2px);
     }
-    .artefact-image {
-      width: 100%;
-      height: auto;
-      max-height: 500px;
-      object-fit: cover;
-      display: block;
-    }
-    .artefact-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 12px 0 12px;
-    }
-    .artefak-notation {
-      padding: 12px;
-      font-size: 14px;
-      color: var(--text);
-      background: var(--surface);
-    }
     
+    /* === POST (rant) === */
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 14px 8px 14px;
+    }
+    .post-username {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
     .post-emojis {
       display: flex;
-      gap: 12px;
-      margin-top: 12px;
-      font-size: 18px;
-      cursor: pointer;
+      gap: 8px;
+      font-size: 16px;
     }
     .post-emojis span {
       opacity: 0.8;
+      cursor: pointer;
       transition: all 0.2s;
     }
     .post-emojis span:hover {
       opacity: 1;
       transform: scale(1.2);
     }
+    .post-content {
+      padding: 0 14px 14px 14px;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
     
+    /* === ARTEFAK (foto) === */
+    .artefact-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9; /* Landscape */
+      overflow: hidden;
+    }
+    .artefact-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .artefact-notation {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 6px;
+      border-radius: 4px;
+      max-width: 70%;
+      line-height: 1.3;
+      backdrop-filter: blur(2px);
+      pointer-events: none;
+    }
+
+    /* === HANGOUTS === */
     .hangout-item {
       background: var(--surface-elevated);
       border: 1px solid var(--border);
@@ -796,7 +796,7 @@
         const existing = await supabaseFetch('reactions', 'GET', null, filter);
         
         if (existing.length > 0) {
-          return; // Cegah double-react
+          return;
         } else {
           await supabaseFetch('reactions', 'POST', payload);
           showEmojiPopup(EMOJI_POPUPS[emoji]);
@@ -807,33 +807,50 @@
       }
     }
 
-    // === RENDER RANT & ARTEFAK ===
+    // === RENDER POST & ARTEFAK ===
     function renderPost(container, post, type) {
       const el = document.createElement('div');
       el.className = type === 'artefact' ? 'artefact-item' : 'post-item';
       
       if (type === 'artefact') {
-        el.innerHTML = `
-          <div class="artefact-header">
-            <span class="post-username">@${post.username}</span>
-          </div>
+        // Header: username + emoji
+        const header = document.createElement('div');
+        header.className = 'post-header';
+        header.innerHTML = `
+          <span class="post-username">@${post.username}</span>
+          <div class="post-emojis"></div>
+        `;
+        el.appendChild(header);
+
+        // Container gambar + notasi overlay
+        const containerDiv = document.createElement('div');
+        containerDiv.className = 'artefact-container';
+        containerDiv.innerHTML = `
           <img src="${post.image_url}" class="artefact-image" loading="lazy" />
-          ${post.notation ? `<div class="artefak-notation">${post.notation}</div>` : ''}
+          ${post.notation ? `<div class="artefact-notation">${post.notation}</div>` : ''}
         `;
+        el.appendChild(containerDiv);
       } else {
-        el.innerHTML = `
-          <div class="post-header">
-            <span class="post-username">@${post.username}</span>
-          </div>
-          <div class="post-content">${post.content}</div>
+        // Rant biasa
+        const header = document.createElement('div');
+        header.className = 'post-header';
+        header.innerHTML = `
+          <span class="post-username">@${post.username}</span>
+          <div class="post-emojis"></div>
         `;
+        el.appendChild(header);
+
+        const content = document.createElement('div');
+        content.className = 'post-content';
+        content.textContent = post.content;
+        el.appendChild(content);
       }
+
       container.appendChild(el);
 
-      // Emoji reaksi (kecuali punya sendiri)
+      // Tambahkan emoji reaksi (jika bukan milik sendiri)
       if (post.username !== currentUser.replace(/^@/, '')) {
-        const emojiBar = document.createElement('div');
-        emojiBar.className = 'post-emojis';
+        const emojiBar = el.querySelector('.post-emojis');
         ['🤠', '😢', '🤗', '🔥'].forEach(emoji => {
           const span = document.createElement('span');
           span.textContent = emoji;
@@ -845,7 +862,6 @@
           };
           emojiBar.appendChild(span);
         });
-        el.appendChild(emojiBar);
       }
     }
 
@@ -853,12 +869,9 @@
     async function loadFeed() {
       try {
         const rants = await supabaseFetch('rants', 'GET', null, '?order=created_at.desc&limit=100');
-        rantsDataCache = rants;
-
         const artefacts = await supabaseFetch('artefacts', 'GET', null, '?order=created_at.desc&limit=100');
-        artefactsDataCache = artefacts;
 
-        // Keyword tetap untuk rants (sesuai visi awal)
+        // Keyword untuk rant (tetap)
         const HYPE_KEYWORDS = ['v!', 'kpop', 'drakor', 'anime', 'au', 'stan'];
         const NGUSAHAIN_KEYWORDS = ['skripsi', 'jualan', 'progres', 'usaha'];
         const SPILL_KEYWORDS = ['capek', 'sendiri', 'nangis', 'lelah'];
@@ -880,10 +893,9 @@
           else if (spillRants.length < 5) spillRants.push(r);
         });
 
-        // ARTEFAK: ACAK KE ZONA TANPA FILTER
+        // ARTEFAK: ACAK ke zona
         const hypeArtefacts = [], ngusahainArtefacts = [], spillArtefacts = [];
         const zones = ['hype', 'ngusahain', 'spill'];
-
         artefacts.forEach(a => {
           const zone = zones[Math.floor(Math.random() * zones.length)];
           if (zone === 'hype' && hypeArtefacts.length < 5) hypeArtefacts.push(a);
@@ -891,7 +903,6 @@
           else if (spillArtefacts.length < 5) spillArtefacts.push(a);
         });
 
-        // Acak urutan dalam tiap zona agar lebih dinamis
         const shuffle = arr => [...arr].sort(() => 0.5 - Math.random());
         renderZone('hype', shuffle([...hypeRants, ...hypeArtefacts]));
         renderZone('ngusahain', shuffle([...ngusahainRants, ...ngusahainArtefacts]));
@@ -921,7 +932,7 @@
       });
     }
 
-    // === HANGOUTS ===
+    // === HANGOUTS (tidak diubah) ===
     async function loadHangouts() {
       try {
         const data = await supabaseFetch('hangouts', 'GET', null, '?order=created_at.desc');
@@ -960,7 +971,7 @@
       `.join(''));
     }
 
-    // === MODAL HANGOUT ===
+    // === MODAL & NAVIGATION (tidak diubah) ===
     function openAddHangout(category) {
       document.getElementById('input-category').value = category;
       document.getElementById('modal-add').classList.add('active');
@@ -990,7 +1001,6 @@
       }
     });
 
-    // === NAVIGATION ===
     function navigateTo(page) {
       window.location.href = page;
     }
