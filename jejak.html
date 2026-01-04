@@ -617,7 +617,7 @@
         const formData = new FormData();
         formData.append('file', file);
 
-        const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/ARTEFACTS/${fileName}`, {
+        const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/artefacts/${fileName}`, {
           method: 'POST',
           headers: {
             'apikey': SUPABASE_KEY,
@@ -631,7 +631,7 @@
         }
 
         // ✅ URL HARUS PAKAI /public/
-        const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/ARTEFACTS/${fileName}`;
+        const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/artefacts/${fileName}`;
 
         await supabaseFetch('artefacts', 'POST', {
           username: currentUser,
